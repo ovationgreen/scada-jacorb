@@ -576,6 +576,58 @@ public class StructType
             }
         }
         ps.println("\t}");
+        
+        if (!this.exc)
+        {
+          ps.println("\tpublic static " + type + " clone (final " + type + " that)");
+          ps.println("\t{");
+          ps.println("\t\t" + type + " result = new " + type + "(that);");
+
+          for (Enumeration e = this.memberlist.v.elements(); e.hasMoreElements(); )
+          {
+            Member m = (Member)e.nextElement();
+            Declarator d = m.declarator;
+            TypeSpec typeSpec = m.type_spec.typeSpec();
+            String helperName = null;
+            
+            if ((typeSpec instanceof AliasTypeSpec)) {
+              typeSpec = ((AliasTypeSpec)typeSpec).originalType();
+            }
+            if ((typeSpec instanceof VectorType)) {
+              typeSpec = ((VectorType)typeSpec).elementTypeSpec();
+            }
+            if ((typeSpec instanceof ConstrTypeSpec)) {
+              ConstrTypeSpec constr = (ConstrTypeSpec)typeSpec;
+              if(constr.c_type_spec instanceof UnionType) {
+                UnionType union = (UnionType)constr.c_type_spec;
+                typeSpec = union.switch_type_spec.typeSpec();
+                helperName = union.typeName() + "Helper";
+              }              
+            }       
+            try
+            {
+              if(helperName == null) {
+                helperName = typeSpec.helperName();
+              }
+              ps.println("\t\tresult." + d.name() + " = " + helperName + ".clone(that." + d.name() + ");");
+            }
+            catch (NoHelperException localNoHelperException) {
+            }
+          }
+          ps.println("\t\treturn result;");
+          ps.println("\t}");
+
+          ps.println("\tpublic static " + type + "[] clone (final " + type + "[] seq)");
+          ps.println("\t{");
+          ps.println("\t\t" + type + "[] result = new " + type + "[seq.length];");
+          ps.println("\t\tfor(int i=0; i<seq.length; i++)");
+          ps.println("\t\t{");
+          ps.println("\t\t\tresult[i] = clone(seq[i]);");
+          ps.println("\t\t}");
+          ps.println("\t\treturn result;");
+          ps.println("\t}");
+        }
+        
         ps.println("}");
     }
 
@@ -785,8 +837,23 @@ public class StructType
                     ps.println(d.name() + ";");
                 }
                 ps.println("\t}");
+                
+                {
+                  ps.println("\tpublic " + className + "(" + className + " that)");
+                  ps.println("\t{");
+                  ps.print("\t\tthis(");
+                  for (Enumeration e = this.memberlist.v.elements(); e.hasMoreElements(); )
+                  {
+                    Member m = (Member)e.nextElement();
+                    Declarator d = m.declarator;
+                    ps.print("that.");
+                    ps.print(d.name());
+                    if (!e.hasMoreElements()) continue; ps.print(", ");
+                  }
+                  ps.println(");");
+                  ps.println("\t}");
+                }
             }
-
         }
         ps.println("}");
     }
@@ -978,7 +1045,7 @@ public class StructType
         buffer.append("\t\t}");
         buffer.append(Environment.NL);
         buffer.append("\t}");
-        buffer.append(Environment.NL);
+        //buffer.append(Environment.NL);
 
         printwriter.println(buffer.toString());
         printwriter.println();

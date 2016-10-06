@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.jacorb</groupId>
         <artifactId>jacorb-parent</artifactId>
-        <version>3.8</version>
+        <version>3.8.0.1</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -80,13 +80,13 @@
             </plugin>
 
             <!-- Generate javadoc. Bound into the package phase for deployment purposes -->
-            <plugin>
+            <!--plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <subpackages>org.jacorb.idl</subpackages>
                 </configuration>
-            </plugin>
+            </plugin-->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

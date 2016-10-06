@@ -70,8 +70,6 @@ public class SSLListenerUtil
         final SSLSessionListener listener = orb.getTransportManager().getSocketFactoryManager().getSSLListener();
         final Logger logger = orb.getConfiguration().getLogger("org.jacorb.ssl.sessionlistener"); // TODO kategorie
 
-        String localhost = IIOPAddress.getLocalHostAddress(logger);
-
         // Not nice, but as a javax.net.ssl.SSLException extends
         // java.io.IOException we need to work out which one it is in order
         // to call the correct listener.
@@ -86,7 +84,7 @@ public class SSLListenerUtil
                             socket.getPort(),
                             null,
                             socket.getLocalPort(),
-                            localhost,
+                            IIOPAddress.getLocalHostAddress(logger),
                             ex
                     )
             );
@@ -102,7 +100,7 @@ public class SSLListenerUtil
                             socket.getPort(),
                             null,
                             socket.getLocalPort(),
-                            localhost,
+                            IIOPAddress.getLocalHostAddress(logger),
                             ex
                     )
             );
@@ -118,7 +116,7 @@ public class SSLListenerUtil
                             socket.getPort(),
                             null,
                             socket.getLocalPort(),
-                            localhost,
+                            IIOPAddress.getLocalHostAddress(logger),
                             ex
                     )
             );
@@ -134,7 +132,7 @@ public class SSLListenerUtil
                             socket.getPort(),
                             null,
                             socket.getLocalPort(),
-                            localhost,
+                            IIOPAddress.getLocalHostAddress(logger),
                             ex
                     )
             );
@@ -150,7 +148,7 @@ public class SSLListenerUtil
                             socket.getPort(),
                             null,
                             socket.getLocalPort(),
-                            localhost,
+                            IIOPAddress.getLocalHostAddress(logger),
                             ex
                     )
             );

@@ -47,14 +47,14 @@ public class ClientIIOPConnection
 {
     private int timeout = 0;
 
-    private int ssl_port = -1;
+    protected int ssl_port = -1;
     private int noOfRetries  = 5;
     private int retryInterval = 0;
     private boolean doSupportSSL = false;
     private int client_required = -1;
     private int client_supported = -1;
     private TransportManager transportManager;
-    private TCPConnectionListener connectionListener;
+    protected TCPConnectionListener connectionListener;
     private boolean keepAlive;
 
     //for testing purposes only: # of open transports
@@ -185,6 +185,8 @@ public class ClientIIOPConnection
                 }
                 catch ( IOException c )
                 {
+                    logger.debug("Exception", c );
+
                     //only sleep and print message if we're actually
                     //going to retry
                     retries--;
@@ -202,6 +204,9 @@ public class ClientIIOPConnection
                         }
                         catch( InterruptedException i )
                         {
+                            Thread.currentThread().interrupt();
+                            retries = -1;
+                            break;
                         }
                     }
                 }
@@ -267,7 +272,7 @@ public class ClientIIOPConnection
      * the target profile, starting with the primary IIOP address,
      * and then any alternate IIOP addresses that have been specified.
      */
-    private void createSocket(long time_out)
+    protected void createSocket(long time_out)
         throws IOException
     {
         List<ProtocolAddressBase> addressList = new ArrayList<ProtocolAddressBase>();
@@ -437,12 +442,12 @@ public class ClientIIOPConnection
     }
 
 
-    private SocketFactory getSocketFactory()
+    protected SocketFactory getSocketFactory()
     {
         return transportManager.getSocketFactoryManager().getSocketFactory();
     }
 
-    private SocketFactory getSSLSocketFactory()
+    protected SocketFactory getSSLSocketFactory()
     {
         return transportManager.getSocketFactoryManager().getSSLSocketFactory();
     }

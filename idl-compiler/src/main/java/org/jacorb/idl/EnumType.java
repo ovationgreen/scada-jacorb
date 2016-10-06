@@ -302,6 +302,31 @@ public class EnumType
         ps.println("\t{");
         ps.println("\t\tout.write_long(s.value());");
         ps.println("\t}");
+        
+        /**
+         * Clone.
+         */
+        {
+          ps.println("\tpublic static " + className + " clone (final " + className + " that)");
+          ps.println("\t{");
+          ps.println("\t\treturn that;");
+          ps.println("\t}");
+        }
+        /**
+         * Clone sequence.
+         */
+        {
+          ps.println("\tpublic static " + className + "[] clone (final " + className + "[] seq)");
+          ps.println("\t{");
+          ps.println("\t\t" + className + "[] result = new " + className + "[seq.length];");
+          ps.println("\t\tfor(int i=0; i<seq.length; i++)");
+          ps.println("\t\t{");
+          ps.println("\t\t\tresult[i] = clone(seq[i]);");
+          ps.println("\t\t}");
+          ps.println("\t\treturn result;");
+          ps.println("\t}");
+        }
+        
         ps.println("}");
     }
 
@@ -314,66 +339,56 @@ public class EnumType
 
         printClassComment("enum", className, pw);
 
-        pw.println("public" + parser.getFinalString() + " class " + className);
-        pw.println("\timplements org.omg.CORBA.portable.IDLEntity" + Environment.NL + "{");
-
-        printSerialVersionUID(pw);
-
-        pw.println("\tprivate int value = -1;");
-
+        pw.println("public enum " + className);
+        pw.println("\timplements org.omg.CORBA.portable.IDLEntity\n{");        
+        
+        /**
+         * Enumeration.
+         */
         for (Enumeration e = enumlist.v.elements(); e.hasMoreElements();)
         {
             String label = (String) e.nextElement();
-            pw.println("\tpublic static final int _" + label + " = " + (const_counter++) + ";");
-            pw.println("\tpublic static final " + name + " " + label + " = new " + name + "(_" + label + ");");
+            pw.print("\t" + label);
+            pw.println(e.hasMoreElements() ? "," : ";");
         }
+        /**
+         * 
+         */
+        if (!pack_name.startsWith("com.mitateknik.")) {
+          const_counter = 0;
+          for (Enumeration e = enumlist.v.elements(); e.hasMoreElements();)
+          {
+              String label = (String) e.nextElement();
+              pw.println("\tpublic static final int _" + label + " = " + (const_counter++) + ";");
+//              pw.println("\tpublic static final " + name + " " + label + " = new " + name + "(_" + label + ");");
+          }
+        }
+        /**
+         * Value.
+         */
         pw.println("\tpublic int value()");
         pw.println("\t{");
-        pw.println("\t\treturn value;");
+        pw.println("\t\treturn ordinal();");
         pw.println("\t}");
-
+        /**
+         * From_int.
+         */
         pw.println("\tpublic static " + name + " from_int(int value)");
         pw.println("\t{");
         pw.println("\t\tswitch (value) {");
-
+        const_counter = 0;
         for (Enumeration e = enumlist.v.elements(); e.hasMoreElements();)
         {
             String label = (String) e.nextElement();
-            pw.println("\t\t\tcase _" + label + ": return " + label + ";");
+//            pw.println("\t\t\tcase _" + label + ": return " + label + ";");
+            pw.println("\t\t\tcase " + (const_counter++) + ": return " + label + ";");            
         }
         pw.println("\t\t\tdefault: throw new org.omg.CORBA.BAD_PARAM();");
         pw.println("\t\t}");
         pw.println("\t}");
-
-        pw.println("\tpublic String toString()");
-        pw.println("\t{");
-        pw.println("\t\tswitch (value) {");
-        for (Enumeration e = enumlist.v.elements(); e.hasMoreElements();)
-        {
-            String label = (String) e.nextElement();
-            pw.println("\t\t\tcase _" + label + ": return \"" + label + "\";");
-        }
-        pw.println("\t\t\tdefault: throw new org.omg.CORBA.BAD_PARAM();");
-        pw.println("\t\t}");
-        pw.println("\t}");
-
-        pw.println("\tprotected " + name + "(int i)");
-        pw.println("\t{");
-        pw.println("\t\tvalue = i;");
-        pw.println("\t}");
-
-        pw.println("\t/**");
-        pw.println("\t * Designate replacement object when deserialized from stream. See");
-        pw.println("\t * http://www.omg.org/docs/ptc/02-01-03.htm#Issue4271");
-        pw.println("\t *");
-        pw.println("\t * @throws java.io.ObjectStreamException");
-        pw.println("\t */");
-        pw.println("\tjava.lang.Object readResolve()");
-        if (!parser.cldc10 )
-            pw.println("\tthrows java.io.ObjectStreamException");
-        pw.println("\t{");
-        pw.println("\t\treturn from_int(value());");
-        pw.println("\t}");
+        
+        printSerialVersionUID(pw);
+                
         pw.println("}");
     }
 

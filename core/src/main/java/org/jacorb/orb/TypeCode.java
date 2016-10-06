@@ -43,8 +43,8 @@ import org.omg.CORBA.ValueMember;
 public class TypeCode
     extends org.omg.CORBA.TypeCode
 {
-    private final int         kind;
-    private TCKind tcKind;
+    private final int kind;
+    private transient TCKind tcKind;
 
     private final String      id;
     private final String      name;

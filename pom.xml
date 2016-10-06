@@ -24,7 +24,7 @@
 
     <groupId>org.jacorb</groupId>
     <artifactId>jacorb-parent</artifactId>
-    <version>3.8</version>
+    <version>3.8.0.1</version>
     <packaging>pom</packaging>
 
     <name>JacORB</name>
@@ -83,9 +83,6 @@
         <module>omgapi</module>
         <module>core</module>
         <module>services</module>
-        <module>test/regression</module>
-        <module>test/orbreinvoke</module>
-        <module>demo</module>
     </modules>
 
 
@@ -94,22 +91,22 @@
             <dependency>
                 <groupId>org.jacorb</groupId>
                 <artifactId>jacorb-omgapi</artifactId>
-                <version>3.8</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jacorb</groupId>
                 <artifactId>jacorb</artifactId>
-                <version>3.8</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jacorb</groupId>
                 <artifactId>jacorb-idl-compiler</artifactId>
-                <version>3.8</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jacorb</groupId>
                 <artifactId>jacorb-services</artifactId>
-                <version>3.8</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!-- External -->
@@ -332,7 +329,7 @@
                 </plugin>
 
                 <!-- Generate javadoc. Bound into the package phase for deployment purposes -->
-                <plugin>
+                <!--plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.10.1</version>
@@ -349,7 +346,7 @@
                             </goals>
                         </execution>
                     </executions>
-                </plugin>
+                </plugin-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
@@ -444,7 +441,7 @@
                         <dependency>
                             <groupId>org.jacorb</groupId>
                             <artifactId>jacorb-idl-compiler</artifactId>
-                            <version>3.8</version>
+                            <version>${project.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -737,6 +734,15 @@
                 </executions>
             </plugin>
         </plugins>
+        
+        <extensions>
+          <extension>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-webdav</artifactId>
+            <version>1.0-beta-2</version>
+          </extension>
+        </extensions>
+        
     </build>
 
     <profiles>
@@ -804,5 +810,43 @@
             </modules>
         </profile>
     </profiles>
+
+  <!-- download artifacts from this repo -->
+  <repositories>
+    <repository>
+      <id>public</id>
+      <name>Public Repositories</name>
+      <url>http://uaap01:8081/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <!-- download plugins from this repo -->
+  <pluginRepositories>
+    <pluginRepository>
+      <id>public</id>
+      <name>Public Repositories</name>
+      <url>http://uaap01:8081/nexus/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <distributionManagement>
+    <!-- Publish the versioned releases here -->
+    <repository>
+      <id>releases</id>
+      <name>Releases</name>
+      <url>dav:http://uaap01:8081/nexus/content/repositories/thirdparty</url>
+    </repository>
+  </distributionManagement>
 
 </project>

@@ -91,50 +91,50 @@ public abstract class ReplyPlaceholder
      * name, that does any specific processing of the reply before
      * returning it to the caller.
      */
-    protected MessageInputStream getInputStream(boolean hasTimeoutPolicy)
-        throws RemarshalException
-    {
-        final boolean _shouldUseTimeout = !hasTimeoutPolicy && timeout > 0;
-        final long _maxWait = _shouldUseTimeout ? System.currentTimeMillis() + timeout : Long.MAX_VALUE;
-        final long _timeout = _shouldUseTimeout ? timeout : 0;
-
-        synchronized(lock)
-        {
-            while(!ready && System.currentTimeMillis() < _maxWait)
-            {
-                try
-                {
-                    lock.wait( _timeout );
-                }
-                catch( InterruptedException e )
-                {
-                    // ignored
-                }
-            }
-
-            if (!ready && _shouldUseTimeout)
-            {
-                timeoutException = true;
-            }
-
-            if( remarshalException )
-            {
-                throw new org.omg.CORBA.portable.RemarshalException();
-            }
-
-            if( communicationException )
-            {
-                throw new org.omg.CORBA.COMM_FAILURE(
-                        0,
-                        org.omg.CORBA.CompletionStatus.COMPLETED_MAYBE );
-            }
-
-            if( timeoutException )
-            {
-                throw new org.omg.CORBA.TIMEOUT ("client timeout reached");
-            }
-
-            return in;
-        }
+  protected MessageInputStream getInputStream(boolean hasTimeoutPolicy) throws RemarshalException {
+    final boolean _shouldUseTimeout = !hasTimeoutPolicy && timeout > 0;
+    
+    long    _timeout = _shouldUseTimeout ? timeout : Long.MAX_VALUE;
+    boolean _interrupted = Thread.currentThread().isInterrupted();
+    long    _interruptedTimeout = -1;                                                                                             
+    long    _startTime;
+    long    _endTime;
+    
+    synchronized (lock) {                                                                                                         
+      while (!ready && _timeout > 0) {
+        _startTime = System.currentTimeMillis();
+        try {
+          lock.wait(_timeout);                                                                                                    
+        }                                                                                                                         
+        catch (InterruptedException e) {                                                                                          
+          if (_interruptedTimeout < 0) {                                                                                          
+            _interruptedTimeout = Long.getLong("jacorb.connection.client.interrupted_timeout", _timeout);                       
+          }                                                                                                                       
+          _timeout = Math.min(_interruptedTimeout, _timeout);                                                                     
+          _interrupted = true;                                                                                                    
+        }                                                                                                                         
+        _endTime  = System.currentTimeMillis();                                                                                
+        _timeout -= Math.abs(_endTime - _startTime);                                                                                
+      }                                                                                                                           
+                                                                                                                                  
+      if (_interrupted) {                                                                                                         
+        Thread.currentThread().interrupt();                                                                                       
+      }                                                                                                                           
+      if (!ready && _shouldUseTimeout) {                                                                                          
+        timeoutException = true;                                                                                                  
+      }                                                                                                                           
+      if (remarshalException) {                                                                                                   
+        throw new org.omg.CORBA.portable.RemarshalException();                                                                    
+      }                                                                                                                           
+      if (communicationException) {                                                                                               
+        throw new org.omg.CORBA.COMM_FAILURE(0, org.omg.CORBA.CompletionStatus.COMPLETED_MAYBE);                                  
+      }                                                                                                                           
+      if (timeoutException) {                                                                                                     
+        throw new org.omg.CORBA.TIMEOUT("client timeout reached");                                                                
+      }                                                                                                                           
+                                                                                                                                  
+      return in;
     }
+  }
+  
 }

@@ -193,7 +193,9 @@ public class TypeDeclaration
 
     public void printSerialVersionUID(PrintWriter ps)
     {
+        String fullClassName  = full_name();
+        long serialVersionUID = Long.getLong(fullClassName + ".serialVersionUID", fullClassName.hashCode()).longValue();
         ps.println("\t/** Serial version UID. */");
-        ps.println("\tprivate static final long serialVersionUID = 1L;");
+        ps.println("\tprivate static final long serialVersionUID = " + serialVersionUID + "L;");
     }
 }

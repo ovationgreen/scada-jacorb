@@ -325,6 +325,9 @@ public class UnionType
         pw.println("public" + parser.getFinalString() + " class " + className);
         pw.println("\timplements org.omg.CORBA.portable.IDLEntity");
         pw.println("{");
+        
+        printSerialVersionUID(pw);
+        pw.println();
 
         TypeSpec ts = switch_type_spec.typeSpec();
 
@@ -547,7 +550,31 @@ public class UnionType
 
         pw.println(Environment.NL + "\tpublic " + className + " ()");
         pw.println("\t{");
-        pw.println("\t}" + Environment.NL);
+        if (def == 0 && defaultStr.length() > 0)
+        {
+          pw.println("\t\t__default();");
+        }
+        pw.println("\t}");
+        
+        pw.println("\n\tpublic " + className + " (" + ts.typeName() + " discriminator)");
+        pw.println("\t{");
+        pw.println("\t\tthis.discriminator = discriminator;");
+        pw.println("\t}");
+
+        {
+          pw.println("\n\tpublic " + className + " (" + className + " that)");
+          pw.println("\t{");
+          pw.println("\t\tthis.discriminator = that.discriminator();");
+          
+          for(Enumeration enumeration = switch_body.caseListVector.elements(); enumeration.hasMoreElements();)
+          {
+              Case member = (Case)enumeration.nextElement();
+              Object declarator = member.element_spec.declarator;
+              
+              pw.println("\t\tthis." + declarator + " = that." + declarator + ";");
+          }          
+          pw.println("\t}" + Environment.NL);
+        }
 
         /*
          * print an accessor method for the discriminator
@@ -739,7 +766,11 @@ public class UnionType
             pw.println("\t\tdiscriminator = _discriminator;");
             pw.println("\t}");
         }
-
+        /**
+         * Print equals method.
+         */
+        printEquals(className, pw);
+        
         pw.println("}");
     }
 
@@ -768,7 +799,7 @@ public class UnionType
 
         if (switch_is_enum)
         {
-            pw.println ("\t\tswitch (discriminator.value ())");
+            pw.println ("\t\tswitch (discriminator)");
             pw.println ("\t\t{");
         }
         else
@@ -776,7 +807,7 @@ public class UnionType
             if (switch_is_bool)
             {
                 /* special case: booleans are no switch type in java */
-                case_str = "if (discriminator  ==";
+                case_str = "if (discriminator == ";
                 colon_str = ")";
                 // colon_str and default_str are already set correctly
             }
@@ -786,7 +817,7 @@ public class UnionType
             }
             else
             {
-                pw.println ("\t\tswitch (discriminator )");
+                pw.println ("\t\tswitch (discriminator)");
                 pw.println ("\t\t{");
             }
         }
@@ -1057,7 +1088,7 @@ public class UnionType
             }
             ps.println(tryIndent + "\t\tdisc = " + switch_ts_resolved.toString() + ".from_int(in.read_long());");
 
-            ps.println(tryIndent + "\t\tswitch (disc.value ())");
+            ps.println(tryIndent + "\t\tswitch (disc)");
             ps.println(tryIndent + "\t\t{");
         }
         else
@@ -1157,8 +1188,8 @@ public class UnionType
 
         if (switch_is_enum)
         {
-            ps.println ("\t\tout.write_long (s.discriminator().value ());");
-            ps.println ("\t\tswitch (s.discriminator().value ())");
+            ps.println ("\t\tout.write_long (s.discriminator().value());");
+            ps.println ("\t\tswitch (s.discriminator())");
             ps.println ("\t\t{");
         }
         else
@@ -1215,6 +1246,70 @@ public class UnionType
         ui.iterate (ps, indent1, indent2, "", case_str, colon_str, default_str);
 
         ps.println ("\t}");
+        
+        {
+          String type = className();
+          
+          ps.println("\tpublic static " + type + " clone (final " + type + " that)");
+          ps.println("\t{");
+          ps.println("\t\t" + type + " result = new " + type + "(that);");
+
+//          try
+          {
+            if(switch_is_enum) {
+              
+              ps.println("\t\tif(result.discriminator() == null)");
+              ps.println("\t\t{");
+              ps.println("\t\t\treturn result;");
+              ps.println("\t\t}");
+              
+              ps.println("\t\tswitch(result.discriminator())");
+              ps.println("\t\t{");
+              
+              for(Enumeration enumeration = switch_body.caseListVector.elements(); enumeration.hasMoreElements();)
+              {
+                Case member = (Case)enumeration.nextElement();
+                Object d = member.element_spec.declarator;
+                TypeSpec typeSpec = member.element_spec.typeSpec;
+                  
+                if ((typeSpec instanceof AliasTypeSpec)) {
+                  typeSpec = ((AliasTypeSpec)typeSpec).originalType();
+                }
+                if ((typeSpec instanceof VectorType)) {
+                  typeSpec = ((VectorType)typeSpec).elementTypeSpec();
+                }
+                            
+                try 
+                {
+                  String helperName = typeSpec.helperName();
+                  String label = member.getLabels()[0].toString();
+                  label = label.substring(label.lastIndexOf(".") + 1, label.length());
+                  
+                  ps.println("\t\t\tcase " + label + ":");
+                  ps.println("\t\t\t\tresult." + d + "(" + helperName + ".clone(that." + d + "()));");
+                  ps.println("\t\t\t\tbreak;");
+                }
+                catch (NoHelperException localNoHelperException) {
+                }              
+              }            
+                          
+              ps.println("\t\t}");
+            }
+          }          
+          
+          ps.println("\t\treturn result;");
+          ps.println("\t}");
+
+          ps.println("\tpublic static " + type + "[] clone (final " + type + "[] seq)");
+          ps.println("\t{");
+          ps.println("\t\t" + type + "[] result = new " + type + "[seq.length];");
+          ps.println("\t\tfor(int i=0; i<seq.length; i++)");
+          ps.println("\t\t{");
+          ps.println("\t\t\tresult[i] = clone(seq[i]);");
+          ps.println("\t\t}");
+          ps.println("\t\treturn result;");
+          ps.println("\t}");
+        }
 
         ps.println("}"); // end of helper class
     }
@@ -1300,7 +1395,77 @@ public class UnionType
             }
         }
     }
+    
+    private void printEquals(String s, PrintWriter printwriter)
+    {
+        printwriter.println("\tpublic boolean equals(java.lang.Object o) ");
+        printwriter.println("\t{ ");
 
+        StringBuffer buffer = new StringBuffer("\t\tif (this == o) return true;");
+        buffer.append("\n");
+        buffer.append("\t\tif (o == null) return false;");
+        buffer.append("\n");
+        buffer.append("\n");
+        buffer.append("\t\tif (o instanceof " + s + " )\n\t\t{");
+        buffer.append("\n");
+        buffer.append("\t\t\tfinal " + s + " obj = ( " + s + " )o;");
+        buffer.append("\n");
+        buffer.append("\t\t\tboolean res = (this.discriminator() == obj.discriminator()); ");
+        buffer.append("\n");
+        buffer.append("\t\t\tdo { ");
+            
+        buffer.append("\n\t\t\t\tif (!res) break;\n\n");
+        
+        for(Enumeration enumeration = switch_body.caseListVector.elements(); enumeration.hasMoreElements();)
+        {
+            Case member = (Case)enumeration.nextElement();
+            Object declarator = member.element_spec.declarator;
+            TypeSpec type_spec = member.element_spec.typeSpec;
+            
+            if(BaseType.isBasicName(type_spec.toString()) && !type_spec.toString().equals("String") && !type_spec.toString().equals("java.lang.String") && type_spec.toString().indexOf("[") < 0)
+            {
+                buffer.append("\t\t\t\tres = (this." + declarator.toString() + " == obj." + declarator.toString() + ");");
+                buffer.append("\n\t\t\t\tif (!res) break;");
+            }
+            else
+            {
+                if(type_spec.toString().indexOf("[") >= 0)
+                {
+                    buffer.append("\t\t\t\tres = (this." + declarator.toString() + " == obj." + declarator.toString() + ") || (this." + declarator.toString() + " != null && obj." + declarator.toString() + " != null && this." + declarator.toString() + ".length == obj." + declarator.toString() + ".length);\n");
+
+                    buffer.append("\t\t\t\tif (res)\n\n\t\t\t\t{\n");
+                    buffer.append("\t\t\t\t\tres = java.util.Arrays.equals(this." + declarator.toString() + ", obj." + declarator.toString() + ");");
+                    buffer.append("\n\t\t\t\t}\n");
+                    buffer.append("\t\t\t\tif(!res) break;");
+                }
+                else
+                {
+                    buffer.append("\t\t\t\tres = (this." + declarator.toString() + " == obj." + declarator.toString() + ") || (this." + declarator.toString() + " != null && obj." + declarator.toString() + " != null && this." + declarator.toString() + ".equals (obj." + declarator.toString() + "));");
+                    buffer.append("\n\t\t\t\tif (!res) break;");
+                }
+            }
+            if(enumeration.hasMoreElements()) buffer.append("\n\n");
+        }
+
+        buffer.append("\t\t\t}");
+        buffer.append("\n");
+        buffer.append("\t\t\twhile(false);");
+        buffer.append("\n");
+        buffer.append("\t\t\treturn res;");
+        buffer.append("\n");
+        buffer.append("\t\t}");
+        buffer.append("\n");
+        buffer.append("\t\telse\n\t\t{\n");
+        buffer.append("\t\t\treturn false;");
+        buffer.append("\n");
+        buffer.append("\t\t}");
+        buffer.append("\n");
+        buffer.append("\t}");
+
+        printwriter.println(buffer.toString());
+        printwriter.println();
+    }
+    
     public void printInsertIntoAny(PrintWriter ps,
                                    String anyname,
                                    String varname)
@@ -1408,9 +1573,8 @@ public class UnionType
                         if (switch_is_enum)
                         {
                             caseWriter.println (indent1 + case_str
-                                                + _t.substring (0, _t.lastIndexOf ('.') + 1)
-                                                + "_" + _t.substring (_t.lastIndexOf ('.') + 1)
-                                                + colon_str);
+                                + _t.substring (_t.lastIndexOf ('.') + 1)
+                                + colon_str);
                         }
                         else
                         {

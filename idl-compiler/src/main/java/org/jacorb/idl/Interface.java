@@ -985,6 +985,30 @@ public class Interface
         }
 
         ps.println("\t}");
+        
+        /**
+         * Clone.
+         */
+        {
+          ps.println("\tpublic static " + typeName() + " clone (final " + typeName() + " that)");
+          ps.println("\t{");
+          ps.println("\t\treturn that;");
+          ps.println("\t}");
+        }
+        /**
+         * Clone sequence.
+         */
+        {
+          ps.println("\tpublic static " + typeName() + "[] clone (final " + typeName() + "[] seq)");
+          ps.println("\t{");
+          ps.println("\t\t" + typeName() + "[] result = new " + typeName() + "[seq.length];");
+          ps.println("\t\tfor(int i=0; i<seq.length; i++)");
+          ps.println("\t\t{");
+          ps.println("\t\t\tresult[i] = clone(seq[i]);");
+          ps.println("\t\t}");
+          ps.println("\t\treturn result;");
+          ps.println("\t}");
+        }
 
         // Generate narrow methods (cf. Java Mapping 1.2, sect. 1.5.2)
         if (is_abstract)
@@ -1103,6 +1127,9 @@ public class Interface
         ps.println("\t{");
         ps.println("\t\treturn ids;");
         ps.println("\t}" + Environment.NL);
+        
+        ps.println("\tprotected boolean isRemote = false;");
+        ps.println("\tpublic boolean _is_local() { return !this.isRemote && super._is_local(); }\n");
 
         if (!parser.cldc10)
         {

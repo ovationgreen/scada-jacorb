@@ -245,7 +245,7 @@ public class GssUpContext
         //find first octet where the MSB is zero
         int index = 1;
         while(index < gssToken.length &&
-              (gssToken[index] & 0x80) == 1)
+              (gssToken[index] & 0x80) != 0)
         {
             ++index;
         }

@@ -128,7 +128,7 @@ parser code
     /*  a la CORBA 2.4, allow forward declarations that remain undefined */
     public static boolean sloppy = false;
 
-    public static String currentDate = java.text.DateFormat.getDateTimeInstance().format(new java.util.Date());
+    public static String currentDate = new java.text.SimpleDateFormat("dd-MM-yy HH:mm:ss.SSS").format(new java.util.Date());
 
     private static ObjectCachePlugin objectCachePlugin;
 
@@ -576,6 +576,8 @@ parser code
     private static void prepareAndParse(String fileName)
         throws Exception
     {
+        System.out.println("\t" + fileName);
+        
         GlobalInputStream.init();
         GlobalInputStream.setInput( fileName );
 

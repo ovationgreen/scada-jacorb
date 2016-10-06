@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
 import org.jacorb.config.Configuration;
 import org.jacorb.config.ConfigurationException;
 import org.jacorb.orb.CodeSet;
@@ -344,6 +345,8 @@ public abstract class GIOPConnection
                 }
                 catch ( InterruptedException ie )
                 {
+                    Thread.currentThread().interrupt();
+                    return false;
                 }
             }
             return !do_close;
@@ -898,25 +901,34 @@ public abstract class GIOPConnection
         }
     }
 
-    // timeout is in milliseconds and is an interval
-    protected final boolean getWriteLock (long timeout)
-    {
-        long endTime = (timeout > 0 ? System.currentTimeMillis() + timeout : Long.MAX_VALUE);
-
-        while (endTime > System.currentTimeMillis())
-        {
-            long remainingTime = endTime - System.currentTimeMillis();
-            try
-            {
-                return writeLock.tryLock (remainingTime, TimeUnit.MILLISECONDS);
-            }
-            catch( InterruptedException e )
-            {
-                // disregard
-            }
-        }
-        return false;
+  // timeout is in milliseconds and is an interval
+  protected final boolean getWriteLock(long timeout) {
+    if (timeout == 0) {
+      timeout = Long.MAX_VALUE;
     }
+    boolean wasInterrupted = Thread.currentThread().isInterrupted();
+    boolean locked = writeLock.tryLock();
+    long    minDelay = -1;
+    while (!locked && timeout > 0) {
+      long startTime = System.currentTimeMillis();
+      try {
+        locked = writeLock.tryLock(timeout, TimeUnit.MILLISECONDS);
+      }
+      catch (InterruptedException e) {
+        if (minDelay < 0) {
+          minDelay = Long.getLong("jacorb.connection.client.interrupted_timeout", timeout);
+        }
+        timeout = Math.min(minDelay, timeout);
+        wasInterrupted = true;
+      }
+      long endTime = System.currentTimeMillis();
+      timeout -= Math.abs(endTime - startTime);
+    }
+    if (wasInterrupted) {
+      Thread.currentThread().interrupt();
+    }
+    return locked;
+  }
 
     protected final void releaseWriteLock()
     {
