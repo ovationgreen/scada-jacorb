@@ -61,7 +61,7 @@ import org.jacorb.orb.listener.SSLSessionListener;
 public class SSLSocketFactory
     extends AbstractSocketFactory
 {
-    private SocketFactory factory = null;
+    protected SocketFactory factory = null;
     private String[] cipher_suites = null;
     private String[] enabledProtocols = null;
     private TrustManager trustManager = null;
@@ -209,7 +209,7 @@ public class SSLSocketFactory
      * common ssl socket initialization
      * @param socket
      */
-    private void initSSLSocket(SSLSocket socket)
+    protected void initSSLSocket(SSLSocket socket)
     {
         // Andrew T. Finnell
         // We need a way to enable the cipher suites that we would like to use
