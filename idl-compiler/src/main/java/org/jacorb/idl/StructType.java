@@ -996,7 +996,12 @@ public class StructType
         for(Enumeration enumeration = memberlist.v.elements(); enumeration.hasMoreElements();)
         {
             Member member = (Member)enumeration.nextElement();
-            if(BaseType.isBasicName(member.type_spec.toString()) && !member.type_spec.toString().equals("String") && !member.type_spec.toString().equals("java.lang.String") && member.type_spec.toString().indexOf("[") < 0)
+            if (BaseType.isBasicName(member.type_spec.toString()) && member.type_spec.toString().equals("double")) {
+              buffer.append("\t\t\t\tres = Double.compare(this." + member.declarator.toString() + ", obj." + member.declarator.toString() + ") == 0;");
+              buffer.append(Environment.NL);
+              buffer.append("\t\t\t\tif (!res) break;" + Environment.NL + Environment.NL);
+            }
+            else if(BaseType.isBasicName(member.type_spec.toString()) && !member.type_spec.toString().equals("String") && !member.type_spec.toString().equals("java.lang.String") && member.type_spec.toString().indexOf("[") < 0)
             {
                 buffer.append("\t\t\t\tres = (this." + member.declarator.toString() + " == obj." + member.declarator.toString() + ");");
                 buffer.append(Environment.NL);
