@@ -718,7 +718,7 @@ public class NamingContextImpl
      *
      */
 
-    void init(org.omg.PortableServer.POA poa)
+    public void init(org.omg.PortableServer.POA poa)
     {
         this.poa = poa;
 

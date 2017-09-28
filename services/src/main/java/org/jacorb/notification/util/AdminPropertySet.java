@@ -57,6 +57,12 @@ public class AdminPropertySet
         _adminProps.add(MaxConsumers.value);
         _adminProps.add(MaxSuppliers.value);
         _adminProps.add(RejectNewEvents.value);
+        
+        _adminProps.add("IsMitaTeknik");
+        _adminProps.add("IsGateway");
+        _adminProps.add("NotifyChannel");
+        _adminProps.add("DatabaseHost");
+        _adminProps.add("DatabaseName");
 
         sAdminPropertyNames_ = Collections.unmodifiableSet(_adminProps);
     }
