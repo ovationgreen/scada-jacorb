@@ -599,6 +599,21 @@ public class IIOPAddress extends ProtocolAddressBase
      */
     public static LinkedList<InetAddress> getNetworkInetAddresses()
     {
+      try {
+        Class<?> cache = Class.forName("com.mitateknik.util.net.NetworkInterfaceCache");
+        
+        java.lang.reflect.Method getInstance       = cache.getMethod("getInstance");
+        java.lang.reflect.Method getLocalAddresses = cache.getMethod("getLocalAddresses");
+        
+        Object instance = getInstance.invoke(cache);
+        Object result   = getLocalAddresses.invoke(instance);
+        
+        return (LinkedList<InetAddress>)result;
+      }
+      catch (Throwable e) {
+        ((org.jacorb.orb.ORBSingleton) ORBSingleton.init()).getLogger().error("Unable to determine network interfaces cache", e);
+      }
+      
         LinkedList<InetAddress> result = new LinkedList<InetAddress>();
         LinkedList<InetAddress> virtual = new LinkedList<InetAddress>();
         LinkedList<InetAddress> p2plinklocal = new LinkedList<InetAddress>();
