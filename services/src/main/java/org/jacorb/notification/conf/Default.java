@@ -36,7 +36,7 @@ public interface Default
 
     String DEFAULT_DISCARD_POLICY = "PriorityOrder";
 
-    int DEFAULT_MAX_EVENTS_PER_CONSUMER = 100;
+    int DEFAULT_MAX_EVENTS_PER_CONSUMER = 50000;
 
     int DEFAULT_MAX_BATCH_SIZE = 1;
 
