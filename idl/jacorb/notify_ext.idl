@@ -1,0 +1,15 @@
+
+module NotifyExt {
+
+  interface ReconnectionCallback {
+    void reconnect(in Object ref);
+    boolean is_alive();
+  };
+  
+  interface ReconnectionRegistry {
+    long register_callback(in ReconnectionCallback callback);
+    void unregister_callback(in long paramInt);
+    boolean is_alive();
+  };
+  
+};

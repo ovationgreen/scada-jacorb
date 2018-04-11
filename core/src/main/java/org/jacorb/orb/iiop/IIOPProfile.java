@@ -306,7 +306,7 @@ public class IIOPProfile
      * Adds further addresses to this profile as TAG_ALTERNATE_IIOP_ADDRESS,
      * if this has been configured in the Configuration.
      */
-    private void addAlternateAddresses (org.jacorb.config.Configuration config) throws ConfigurationException
+    public void addAlternateAddresses (org.jacorb.config.Configuration config) throws ConfigurationException
     {
         String value = config.getAttribute ("jacorb.iiop.alternate_addresses", null);
         if (value == null)
@@ -371,7 +371,7 @@ public class IIOPProfile
      * Also excluded are non-IPv4 addresses for the moment.
     * @throws ConfigurationException
      */
-    private void addNetworkAddresses() throws ConfigurationException
+    public void addNetworkAddresses() throws ConfigurationException
     {
         if (primaryAddress == null) return;
         if (components == null) components = new TaggedComponentList();
@@ -388,7 +388,13 @@ public class IIOPProfile
             {
                 IIOPAddress iaddr = new IIOPAddress();
                 iaddr.configure (configuration);
-                String ipaddr = addr.toString().substring(1);
+                
+                String ipaddr = addr.getHostAddress();
+                if (ipaddr == null)
+                  continue;
+                if (ipaddr.startsWith("/"))
+                  ipaddr = ipaddr.substring(1);
+                
                 if (addr instanceof Inet4Address)
                 {
                     iaddr.fromString (ipaddr + ":"

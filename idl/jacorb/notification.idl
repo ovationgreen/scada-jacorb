@@ -1,13 +1,17 @@
 #include <CosNotifyChannelAdmin.idl>
+#include <notify_ext.idl>
 
 module org {
   module jacorb {
     module notification {
+    
       interface JacORBEventChannelFactory:
-		::CosNotifyChannelAdmin::EventChannelFactory
+        ::CosNotifyChannelAdmin::EventChannelFactory,
+        ::NotifyExt::ReconnectionRegistry
       {
-		void destroy();
+		    void destroy();
       };
+      
     };
   };
 };

@@ -525,7 +525,8 @@ public class IIOPAddress extends ProtocolAddressBase
         // things that could be used off-host. Writing a link-local zone
         // ID would break the client. Site-local zone IDs are still used,
         // but deprecated. For now, we will ignore site-local zone IDs.
-        cdr.write_string(getHostName());
+        // cdr.write_string(getHostName());
+        cdr.write_string(getOriginalHost());
         cdr.write_ushort((short) port);
     }
 
@@ -729,4 +730,13 @@ public class IIOPAddress extends ProtocolAddressBase
         result.logger = logger;
         return result;
     }
+    
+    public void setUnresolvable(boolean unresolvable) {
+      this.unresolvable = unresolvable;
+    }
+    
+    public boolean isUnresolvable() {
+      return unresolvable;
+    }
+    
 }

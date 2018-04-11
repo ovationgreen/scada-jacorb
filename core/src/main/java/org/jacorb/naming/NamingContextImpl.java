@@ -121,21 +121,21 @@ public class NamingContextImpl
             {
                 // if the name is still in use, try to ping the object
                 org.omg.CORBA.Object s = (org.omg.CORBA.Object)names.get(n);
-                if( isDead(s) )
+                /*if( isDead(s) )
                 {
                     rebind( n.components(), obj );
                     return;
-                }
+                }*/
                 throw new AlreadyBound();
             }
             else if( contexts.containsKey( n ))
             {
                 // if the name is still in use, try to ping the object
                 org.omg.CORBA.Object s = (org.omg.CORBA.Object)contexts.get(n);
-                if( isDead(s) )
+                /*if( isDead(s) )
                 {
                     unbind( n.components());
-                }
+                }*/
                 throw new AlreadyBound();
             }
 
@@ -281,22 +281,22 @@ public class NamingContextImpl
             {
                 // if the name is still in use, try to ping the object
                 org.omg.CORBA.Object s = (org.omg.CORBA.Object)names.get(n);
-                if( isDead(s) )
+                /*if( isDead(s) )
                 {
                     unbind( n.components());
                 }
-                else
+                else*/
                     throw new AlreadyBound();
             }
             else if( contexts.containsKey( n ))
             {
                 // if the name is still in use, try to ping the object
                 org.omg.CORBA.Object s = (org.omg.CORBA.Object)contexts.get(n);
-                if( isDead(s) )
+                /*if( isDead(s) )
                 {
                     rebind_context( n.components(), obj );
                     return;
-                }
+                }*/
                 throw new AlreadyBound();
             }
 

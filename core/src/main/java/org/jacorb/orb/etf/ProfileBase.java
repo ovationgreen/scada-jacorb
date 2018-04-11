@@ -252,6 +252,11 @@ public abstract class ProfileBase
     {
         return components;
     }
+    
+    public void setComponents(TaggedComponentList components)
+    {
+        this.components = components;
+    }
 
     public Object getComponent(int tag, Class<?> helper)
     {
@@ -345,5 +350,9 @@ public abstract class ProfileBase
         if (components != null) {
             components.removeComponents(tags);
         }
+    }
+    
+    public org.jacorb.config.Configuration getConfiguration() {
+      return configuration;
     }
 }

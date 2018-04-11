@@ -24,7 +24,7 @@
 
     <groupId>org.jacorb</groupId>
     <artifactId>jacorb-parent</artifactId>
-    <version>3.9.0.2</version>
+    <version>3.9.0.6</version>
     <packaging>pom</packaging>
 
     <name>JacORB</name>
@@ -190,7 +190,7 @@
                 <version>${version.slf4j}</version>
             </dependency>
             <dependency>
-                <groupId>picocontainer</groupId>
+                <groupId>org.picocontainer</groupId>
                 <artifactId>picocontainer</artifactId>
                 <version>1.2</version>
             </dependency>

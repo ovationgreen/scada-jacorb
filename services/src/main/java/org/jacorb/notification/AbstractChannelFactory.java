@@ -28,7 +28,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.Properties;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.jacorb.config.Configuration;
 import org.jacorb.config.ConfigurationException;
@@ -65,11 +68,15 @@ import org.omg.CosNotification.UnsupportedQoS;
 import org.omg.CosNotifyChannelAdmin.ChannelNotFound;
 import org.omg.PortableServer.IdAssignmentPolicy;
 import org.omg.PortableServer.IdAssignmentPolicyValue;
+import org.omg.PortableServer.LifespanPolicyValue;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.Servant;
 import org.picocontainer.MutablePicoContainer;
 import org.slf4j.Logger;
+import NotifyExt.ReconnectionCallback;
+import NotifyExt.ReconnectionRegistry;
+import NotifyExt.ReconnectionRegistryOperations;
 
 /**
  * @author Alphonse Bendt
@@ -133,6 +140,8 @@ public abstract class AbstractChannelFactory implements ManageableServant, Dispo
     private final AtomicInteger eventChannelIDPool_ = new AtomicInteger(0);
 
     private final DisposableManager disposableManager_ = new DisposableManager();
+    
+    private ReconnectionRegistryOperations reconnectionRegistry;
 
     // //////////////////////////////////////
 
@@ -169,9 +178,10 @@ public abstract class AbstractChannelFactory implements ManageableServant, Dispo
 
         POA _rootPOA = (POA) container_.getComponentInstanceOfType(POA.class);
 
-        List<IdAssignmentPolicy> _ps = new ArrayList<IdAssignmentPolicy>();
+        List<org.omg.CORBA.Policy> _ps = new ArrayList<org.omg.CORBA.Policy>();
 
         _ps.add(_rootPOA.create_id_assignment_policy(IdAssignmentPolicyValue.USER_ID));
+        _ps.add(_rootPOA.create_lifespan_policy(LifespanPolicyValue.PERSISTENT));
 
         BiDirGiopPOAComponentAdapter.addBiDirGiopPolicy(_ps, orb, config_);
 
@@ -760,4 +770,22 @@ public abstract class AbstractChannelFactory implements ManageableServant, Dispo
         _channelContainer.registerComponentInstance(IFactory.class, _factory);
         return _channelContainer;
     }
+    
+    public boolean is_alive() {
+      return (reconnectionRegistry != null) ? true : reconnectionRegistry.is_alive();
+    }
+    
+    public int register_callback(ReconnectionCallback callback) {
+      return (reconnectionRegistry != null) ? reconnectionRegistry.register_callback(callback) : -1;
+    }
+
+    public void unregister_callback(int reconnectCallbackId) {
+      if (reconnectionRegistry != null)
+        reconnectionRegistry.unregister_callback(reconnectCallbackId);
+    }
+    
+    public void setReconnectionRegistry(ReconnectionRegistryOperations val) {
+      this.reconnectionRegistry = val;
+    }
+    
 }
