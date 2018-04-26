@@ -24,8 +24,7 @@ package org.jacorb.notification.container;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jacorb.config.*;
-import org.slf4j.Logger;
+import org.jacorb.config.Configuration;
 import org.jacorb.notification.util.LogUtil;
 import org.omg.BiDirPolicy.BIDIRECTIONAL_POLICY_TYPE;
 import org.omg.BiDirPolicy.BOTH;
@@ -42,6 +41,7 @@ import org.picocontainer.PicoContainer;
 import org.picocontainer.PicoInitializationException;
 import org.picocontainer.PicoIntrospectionException;
 import org.picocontainer.defaults.DecoratingComponentAdapter;
+import org.slf4j.Logger;
 
 public class BiDirGiopPOAComponentAdapter extends DecoratingComponentAdapter
 {
@@ -86,6 +86,8 @@ public class BiDirGiopPOAComponentAdapter extends DecoratingComponentAdapter
             final List _policyList = new ArrayList();
 
             _policyList.add(rootPOA.create_implicit_activation_policy(ImplicitActivationPolicyValue.IMPLICIT_ACTIVATION));
+//            _policyList.add(rootPOA.create_lifespan_policy(LifespanPolicyValue.PERSISTENT));
+//            _policyList.add(rootPOA.create_id_assignment_policy(IdAssignmentPolicyValue.USER_ID));
 
             addBiDirGiopPolicy(_policyList, orb, config);
 

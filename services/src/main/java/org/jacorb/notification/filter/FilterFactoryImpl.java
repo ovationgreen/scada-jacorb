@@ -24,9 +24,9 @@ package org.jacorb.notification.filter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jacorb.config.*;
-import org.slf4j.Logger;
+import org.jacorb.config.Configuration;
 import org.jacorb.notification.conf.Attributes;
 import org.jacorb.notification.conf.Default;
 import org.jacorb.notification.interfaces.Disposable;
@@ -38,6 +38,8 @@ import org.jacorb.notification.util.LogUtil;
 import org.omg.CORBA.Any;
 import org.omg.CORBA.ORB;
 import org.omg.CosNotifyFilter.Filter;
+import org.omg.CosNotifyFilter.FilterFactory;
+import org.omg.CosNotifyFilter.FilterFactoryHelper;
 import org.omg.CosNotifyFilter.FilterFactoryPOA;
 import org.omg.CosNotifyFilter.FilterHelper;
 import org.omg.CosNotifyFilter.InvalidGrammar;
@@ -45,8 +47,7 @@ import org.omg.CosNotifyFilter.MappingFilter;
 import org.omg.CosNotifyFilter.MappingFilterHelper;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.Servant;
-
-import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.Logger;
 
 /**
  * @author Alphonse Bendt
@@ -141,6 +142,8 @@ public class FilterFactoryImpl extends FilterFactoryPOA implements Disposable, I
     private final Configuration config_;
 
     private final ServantLifecyleControl servantLifecycle_;
+    
+    private FilterFactory factory_;
 
     // //////////////////////////////////////
 
@@ -157,8 +160,7 @@ public class FilterFactoryImpl extends FilterFactoryPOA implements Disposable, I
         config_ = config;
         logger_ = LogUtil.getLogger(config, getClass().getName());
 
-        useGarbageCollector_ = config.getAttributeAsBoolean(Attributes.USE_GC,
-                Default.DEFAULT_USE_GC);
+        useGarbageCollector_ = config.getAttributeAsBoolean(Attributes.USE_GC, Default.DEFAULT_USE_GC);
         
         if (useGarbageCollector_)
         {
@@ -172,6 +174,11 @@ public class FilterFactoryImpl extends FilterFactoryPOA implements Disposable, I
         }
         
         servantLifecycle_ = new ServantLifecyleControl(this, config);
+        bind();
+    }
+    
+    public FilterFactory getFactory() {
+      return factory_;
     }
 
     public final void addDisposeHook(Disposable d)
@@ -258,5 +265,25 @@ public class FilterFactoryImpl extends FilterFactoryPOA implements Disposable, I
     public POA getPOA()
     {
         return poa_;
+    }
+    
+    private void bind() {
+      factory_ = FilterFactoryHelper.narrow(activate());
+    }
+
+    public void rebind() {
+      logger_.info("Rebind filter factory.");
+      deactivate();
+      
+      /** For some unknown reason, the objects returned by next bind() is deactivated instead of previous object.
+       *  We have to wait some minimum amount of time to fix this shit. */
+      try {
+        Thread.currentThread().sleep(15);
+      }
+      catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      
+      bind();
     }
 }

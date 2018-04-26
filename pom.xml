@@ -24,7 +24,7 @@
 
     <groupId>org.jacorb</groupId>
     <artifactId>jacorb-parent</artifactId>
-    <version>3.9.0.7</version>
+    <version>3.9.0.8</version>
     <packaging>pom</packaging>
 
     <name>JacORB</name>
@@ -67,10 +67,10 @@
         <failIfNoTests>false</failIfNoTests>
 
         <!-- Enforce 1.6 compaatibility -->
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.test.target>1.6</maven.compiler.test.target>
-        <maven.compiler.test.source>1.6</maven.compiler.test.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.test.target>1.8</maven.compiler.test.target>
+        <maven.compiler.test.source>1.8</maven.compiler.test.source>
 
         <datetime>${timestamp}</datetime>
 

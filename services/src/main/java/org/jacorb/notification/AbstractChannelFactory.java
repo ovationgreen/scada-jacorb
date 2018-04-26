@@ -28,16 +28,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 import java.util.Properties;
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.jacorb.config.Configuration;
 import org.jacorb.config.ConfigurationException;
 import org.jacorb.notification.conf.Attributes;
 import org.jacorb.notification.container.BiDirGiopPOAComponentAdapter;
 import org.jacorb.notification.container.PicoContainerFactory;
+import org.jacorb.notification.filter.FilterFactoryImpl;
 import org.jacorb.notification.interfaces.Disposable;
 import org.jacorb.notification.lifecycle.ManageableServant;
 import org.jacorb.notification.util.AdminPropertySet;
@@ -66,16 +65,19 @@ import org.omg.CosNotification.QoSError_code;
 import org.omg.CosNotification.UnsupportedAdmin;
 import org.omg.CosNotification.UnsupportedQoS;
 import org.omg.CosNotifyChannelAdmin.ChannelNotFound;
-import org.omg.PortableServer.IdAssignmentPolicy;
 import org.omg.PortableServer.IdAssignmentPolicyValue;
 import org.omg.PortableServer.LifespanPolicyValue;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.POAHelper;
 import org.omg.PortableServer.Servant;
+import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
+import org.omg.PortableServer.POAPackage.ObjectNotActive;
+import org.omg.PortableServer.POAPackage.ServantAlreadyActive;
+import org.omg.PortableServer.POAPackage.WrongPolicy;
 import org.picocontainer.MutablePicoContainer;
 import org.slf4j.Logger;
+
 import NotifyExt.ReconnectionCallback;
-import NotifyExt.ReconnectionRegistry;
 import NotifyExt.ReconnectionRegistryOperations;
 
 /**
@@ -123,13 +125,13 @@ public abstract class AbstractChannelFactory implements ManageableServant, Dispo
 
     protected final Configuration config_;
 
-    protected final org.omg.CORBA.Object thisRef_;
+    protected org.omg.CORBA.Object thisRef_;
 
     protected final Logger logger_;
 
-    private final String ior_;
+    private String ior_;
 
-    private final String corbaLoc_;
+    private String corbaLoc_;
 
     private final POA eventChannelFactoryPOA_;
 
@@ -142,12 +144,19 @@ public abstract class AbstractChannelFactory implements ManageableServant, Dispo
     private final DisposableManager disposableManager_ = new DisposableManager();
     
     private ReconnectionRegistryOperations reconnectionRegistry;
+    
+    private final ORB orb_;
+    
+    private Servant servant_;
+    
+    private final FilterFactoryImpl filterFactory_;
 
     // //////////////////////////////////////
 
     protected AbstractChannelFactory(final MutablePicoContainer container, final ORB orb)
             throws UserException
     {
+        orb_ = orb;
         container_ = PicoContainerFactory.createRootContainer(container, (org.jacorb.orb.ORB) orb);
 
         if (container != null)
@@ -177,7 +186,9 @@ public abstract class AbstractChannelFactory implements ManageableServant, Dispo
         logger_ = config_.getLogger(getClass().getName());
 
         POA _rootPOA = (POA) container_.getComponentInstanceOfType(POA.class);
-
+        
+        filterFactory_ = (FilterFactoryImpl)container_.getComponentInstanceOfType(FilterFactoryImpl.class);
+        
         List<org.omg.CORBA.Policy> _ps = new ArrayList<org.omg.CORBA.Policy>();
 
         _ps.add(_rootPOA.create_id_assignment_policy(IdAssignmentPolicyValue.USER_ID));
@@ -198,21 +209,37 @@ public abstract class AbstractChannelFactory implements ManageableServant, Dispo
 
         oid_ = (getObjectName().getBytes());
 
-        eventChannelFactoryPOA_.activate_object_with_id(oid_, getServant());
+        bind();
+    }
 
-        thisRef_ = eventChannelFactoryPOA_.id_to_reference(oid_);
+    public void bind() throws ServantAlreadyActive, ObjectAlreadyActive, WrongPolicy, ObjectNotActive {
+      eventChannelFactoryPOA_.activate_object_with_id(oid_, servant_ = getServant());
 
-        if (logger_.isDebugEnabled())
-        {
-            logger_.debug("activated EventChannelFactory with OID '" + new String(oid_) + "' on '"
-                    + eventChannelFactoryPOA_.the_name() + "'");
-        }
+      thisRef_ = eventChannelFactoryPOA_.id_to_reference(oid_);
 
-        ior_ = orb.object_to_string(eventChannelFactoryPOA_.id_to_reference(oid_));
+      if (logger_.isDebugEnabled())
+      {
+          logger_.debug("activated EventChannelFactory with OID '" + new String(oid_) + "' on '"
+                  + eventChannelFactoryPOA_.the_name() + "'");
+      }
 
-        corbaLoc_ = "corbaloc:" + CorbaLoc.generateCorbaloc(orb,eventChannelFactoryPOA_.id_to_servant(oid_)._this_object());
+      ior_ = orb_.object_to_string(eventChannelFactoryPOA_.id_to_reference(oid_));
 
-        ((org.jacorb.orb.ORB) orb).addObjectKey(getShortcut(), ior_);
+      corbaLoc_ = "corbaloc:" + CorbaLoc.generateCorbaloc(orb_,eventChannelFactoryPOA_.id_to_servant(oid_)._this_object());
+
+      ((org.jacorb.orb.ORB) orb_).addObjectKey(getShortcut(), ior_);
+    }
+    
+    public void rebind() throws ServantAlreadyActive, ObjectAlreadyActive, WrongPolicy, ObjectNotActive {
+      logger_.info("Rebind channel factory.");
+      eventChannelFactoryPOA_.deactivate_object(oid_);
+      bind();
+      filterFactory_.rebind();
+      channelManager_.rebind();
+    }
+    
+    public Servant getActiveServant() {
+      return servant_;
     }
 
     // //////////////////////////////////////

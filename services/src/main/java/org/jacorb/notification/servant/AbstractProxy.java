@@ -25,9 +25,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jacorb.config.*;
-import org.slf4j.Logger;
+import org.jacorb.config.Configurable;
+import org.jacorb.config.Configuration;
 import org.jacorb.notification.FilterManager;
 import org.jacorb.notification.IContainer;
 import org.jacorb.notification.OfferManager;
@@ -57,14 +59,13 @@ import org.omg.CosNotifyChannelAdmin.NotConnected;
 import org.omg.CosNotifyChannelAdmin.ProxyType;
 import org.omg.CosNotifyFilter.Filter;
 import org.omg.CosNotifyFilter.FilterAdminOperations;
+import org.omg.CosNotifyFilter.FilterFactory;
 import org.omg.CosNotifyFilter.FilterNotFound;
 import org.omg.CosNotifyFilter.MappingFilter;
 import org.omg.CosNotifyFilter.MappingFilterHelper;
 import org.omg.PortableServer.POA;
 import org.picocontainer.PicoContainer;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
 
 /**
  * @jmx.mbean
@@ -637,4 +638,12 @@ public abstract class AbstractProxy implements FilterAdminOperations, QoSAdminOp
     {
         return isInterFilterGroupOperatorOR_ ? "OR_OP" : "AND_OP";
     }
+
+    public void rebind(FilterFactory filterFactory_) {
+      logger_.info("Rebind proxy {0}", id_);
+      deactivate();
+      activate();
+      filterManager_.rebind(filterFactory_);
+    }
+    
 }

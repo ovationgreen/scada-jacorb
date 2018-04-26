@@ -42,7 +42,7 @@ class FilterFactoryComponentAdapter extends AbstractComponentAdapter
 
     public FilterFactoryComponentAdapter()
     {
-        super(FilterFactory.class, FilterFactory.class);
+        super(FilterFactoryImpl.class, FilterFactoryImpl.class);
     }
 
     public void verify(PicoContainer container)
@@ -66,7 +66,7 @@ class FilterFactoryComponentAdapter extends AbstractComponentAdapter
         return newFilterFactory(container);
     }
 
-    private FilterFactory newFilterFactory(PicoContainer container)
+    private FilterFactoryImpl newFilterFactory(PicoContainer container)
     {
         final MutablePicoContainer _parent = (MutablePicoContainer) container;
 
@@ -92,7 +92,7 @@ class FilterFactoryComponentAdapter extends AbstractComponentAdapter
         FilterFactoryImpl servant =
             (FilterFactoryImpl) _container.getComponentInstanceOfType(FilterFactoryImpl.class);
 
-        return FilterFactoryHelper.narrow(servant.activate());
+        return servant;
     }
 
     private FilterFactory lookupFilterFactory(PicoContainer container)

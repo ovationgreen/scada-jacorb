@@ -31,9 +31,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.jacorb.config.*;
-import org.slf4j.Logger;
+import org.jacorb.config.Configuration;
+import org.jacorb.config.ConfigurationException;
 import org.jacorb.notification.AbstractMessage;
 import org.jacorb.notification.EventTypeWrapper;
 import org.jacorb.notification.MessageFactory;
@@ -64,11 +68,7 @@ import org.omg.CosNotifyFilter.InvalidConstraint;
 import org.omg.CosNotifyFilter.UnsupportedFilterableData;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.Servant;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.slf4j.Logger;
 
 /**
  * The Filter interface defines the behaviors supported by objects which encapsulate constraints
@@ -981,4 +981,10 @@ public abstract class AbstractFilter implements GCDisposable, IServantLifecyle,
             disposable.dispose();
         }
     }
+
+    public void rebind() {
+      servantLifecyle_.deactivate();
+      servantLifecyle_.activate();
+    }
+    
 }

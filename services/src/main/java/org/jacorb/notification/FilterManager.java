@@ -25,15 +25,20 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
 import org.jacorb.notification.util.LogUtil;
+import org.omg.CosNotifyFilter.ConstraintExp;
+import org.omg.CosNotifyFilter.ConstraintInfo;
 import org.omg.CosNotifyFilter.Filter;
 import org.omg.CosNotifyFilter.FilterAdminOperations;
+import org.omg.CosNotifyFilter.FilterFactory;
 import org.omg.CosNotifyFilter.FilterNotFound;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import org.omg.CosNotifyFilter.InvalidConstraint;
+import org.omg.CosNotifyFilter.InvalidGrammar;
+import org.slf4j.Logger;
 
 /**
  * @author Alphonse Bendt
@@ -47,7 +52,7 @@ public class FilterManager implements FilterAdminOperations
 
     ////////////////////////////////////////
 
-    private final Map filters_; 
+    private final Map<Integer, Filter> filters_; 
 
     private final Object filtersLock_ = new Object();
 
@@ -138,7 +143,7 @@ public class FilterManager implements FilterAdminOperations
 
         synchronized (filtersLock_)
         {
-            _filter = (Filter) filters_.get(_key);
+            _filter = filters_.get(_key);
         }
 
         if (_filter == null)
@@ -160,7 +165,7 @@ public class FilterManager implements FilterAdminOperations
 
         synchronized (filtersLock_)
         {
-            _keys = (Integer[]) filters_.keySet().toArray(INTEGER_ARRAY_TEMPLATE);
+            _keys = filters_.keySet().toArray(INTEGER_ARRAY_TEMPLATE);
         }
 
         final int[] _intKeys = new int[_keys.length];
@@ -189,12 +194,38 @@ public class FilterManager implements FilterAdminOperations
             if (filtersModified_)
             {
                 filterList_.clear();
-
                 filterList_.addAll(filters_.values());
-
                 filtersModified_ = false;
             }
         }
         return filtersReadOnlyView_;
     }
+
+    public void rebind(FilterFactory filterFactory_) {
+      try {
+        synchronized (filtersLock_) {
+          if (filters_.isEmpty())
+            return;
+          
+          logger_.info("Rebind {0} filters using factory: {0}", filters_.size(), filterFactory_);
+          filtersModified_ = true;
+          
+          for (Entry<Integer, Filter> entry : filters_.entrySet()) {
+            Filter filterOld = entry.getValue();
+            Filter filterNew = filterFactory_.create_filter(filterOld.constraint_grammar());
+            ConstraintInfo[] infos = filterOld.get_all_constraints();
+            for (ConstraintInfo constraint : infos) {
+              filterNew.add_constraints(new ConstraintExp[]{ constraint.constraint_expression }); 
+            }
+            entry.setValue(filterNew);
+            filterOld.destroy();
+            filterOld._release();
+          }
+        }
+      }
+      catch (InvalidGrammar | InvalidConstraint e) {
+        throw new RuntimeException(e.getMessage(), e);
+      }
+    }
+
 }

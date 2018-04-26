@@ -21,12 +21,14 @@
 
 package org.jacorb.notification.lifecycle;
 
-import org.jacorb.config.*;
+import org.jacorb.config.Configuration;
 import org.jacorb.notification.conf.Attributes;
 import org.jacorb.notification.conf.Default;
 import org.omg.PortableServer.POA;
 import org.omg.PortableServer.Servant;
+import org.omg.PortableServer.POAPackage.ObjectAlreadyActive;
 import org.omg.PortableServer.POAPackage.ObjectNotActive;
+import org.omg.PortableServer.POAPackage.ServantAlreadyActive;
 import org.omg.PortableServer.POAPackage.ServantNotActive;
 import org.omg.PortableServer.POAPackage.WrongPolicy;
 
@@ -65,12 +67,30 @@ public class ServantLifecyleControl implements ManageableServant
             } 
             catch (ServantNotActive e)
             {
-                throw new RuntimeException();
+                throw new RuntimeException(e);
             } 
             catch (WrongPolicy e)
             {
-                throw new RuntimeException();
+                throw new RuntimeException(e);
             }
+        }
+
+        return thisRef_;
+    }
+    
+    public synchronized org.omg.CORBA.Object activate(byte[] oid)
+    {
+        if (thisRef_ == null)
+        {
+            try
+            {
+                delegate_.getPOA().activate_object_with_id(oid, getServant());
+                thisRef_ = delegate_.getPOA().id_to_reference(oid);
+            } 
+            catch (ServantAlreadyActive | ObjectNotActive | ObjectAlreadyActive | WrongPolicy e)
+            {
+                throw new RuntimeException(e);
+            } 
         }
 
         return thisRef_;
@@ -98,15 +118,15 @@ public class ServantLifecyleControl implements ManageableServant
             } 
             catch (WrongPolicy e)
             {
-                throw new RuntimeException();
+                throw new RuntimeException(e);
             } 
             catch (ObjectNotActive e)
             {
-                throw new RuntimeException();
+//                throw new RuntimeException(e);
             } 
             catch (ServantNotActive e)
             {
-                throw new RuntimeException();
+//                throw new RuntimeException(e);
             } 
             finally
             {

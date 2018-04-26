@@ -19,9 +19,9 @@ package org.jacorb.notification;
  *   License along with this library; if not, write to the Free
  *   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
-import org.jacorb.config.*;
+import org.jacorb.config.Configuration;
 import org.jacorb.notification.container.PicoContainerFactory;
+import org.jacorb.notification.filter.FilterFactoryImpl;
 import org.jacorb.notification.servant.AbstractAdmin;
 import org.jacorb.notification.servant.AbstractSupplierAdmin;
 import org.jacorb.notification.servant.IEventChannel;
@@ -33,7 +33,6 @@ import org.omg.CORBA.ORB;
 import org.omg.CosNotifyChannelAdmin.AdminNotFound;
 import org.omg.CosNotifyChannelAdmin.EventChannel;
 import org.omg.CosNotifyChannelAdmin.InterFilterGroupOperator;
-import org.omg.CosNotifyFilter.FilterFactory;
 import org.omg.CosTypedNotifyChannelAdmin.TypedConsumerAdmin;
 import org.omg.CosTypedNotifyChannelAdmin.TypedConsumerAdminHelper;
 import org.omg.CosTypedNotifyChannelAdmin.TypedEventChannelFactory;
@@ -103,7 +102,7 @@ public class TypedEventChannelImpl extends AbstractEventChannel implements
     private final TypedEventChannelFactory typedEventChannelFactory_;
 
     public TypedEventChannelImpl(IFactory factory, ORB orb, POA poa, Configuration config,
-            FilterFactory filterFactory, TypedEventChannelFactory factoryRef)
+        FilterFactoryImpl filterFactory, TypedEventChannelFactory factoryRef)
     {
         super(factory, orb, poa, config, filterFactory);
 

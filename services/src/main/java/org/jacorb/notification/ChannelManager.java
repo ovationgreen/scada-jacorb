@@ -185,4 +185,17 @@ public class ChannelManager implements Disposable
 
         eventListeners_.clear();
     }
+
+    public void rebind() {
+      synchronized (channelsLock_)
+      {
+          Iterator i = channels_.entrySet().iterator();
+
+          while (i.hasNext())
+          {
+              AbstractEventChannel _channel = (AbstractEventChannel) ((Map.Entry) i.next()).getValue();
+              _channel.rebind();
+          }
+      }
+    }
 }

@@ -23,13 +23,15 @@ package org.jacorb.notification.servant;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jacorb.config.*;
-import org.slf4j.Logger;
+import org.jacorb.config.Configuration;
 import org.jacorb.notification.FilterManager;
 import org.jacorb.notification.IContainer;
 import org.jacorb.notification.MessageFactory;
@@ -57,13 +59,12 @@ import org.omg.CosNotifyChannelAdmin.InterFilterGroupOperator;
 import org.omg.CosNotifyChannelAdmin.ProxyNotFound;
 import org.omg.CosNotifyFilter.Filter;
 import org.omg.CosNotifyFilter.FilterAdminOperations;
+import org.omg.CosNotifyFilter.FilterFactory;
 import org.omg.CosNotifyFilter.FilterNotFound;
 import org.omg.CosNotifyFilter.MappingFilter;
 import org.omg.PortableServer.POA;
 import org.picocontainer.MutablePicoContainer;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
 
 /**
  * Abstract Baseclass for Adminobjects.
@@ -697,4 +698,30 @@ public abstract class AbstractAdmin implements QoSAdminOperations,
             jmxCallback_.sendJMXNotification(type, message);
         }
     }
+
+    public void rebind(FilterFactory filterFactory_) {
+      logger_.info("Rebind admin {0}", id_);
+      deactivate();
+      activate();
+      rebindPullServants(filterFactory_);
+      rebindPushServants(filterFactory_);
+      filterManager_.rebind(filterFactory_);
+    }
+
+    private void rebindPullServants(FilterFactory filterFactory_) {
+      synchronized (modifyProxiesLock_) {
+        for (AbstractProxy proxy : (Collection<AbstractProxy>)pullServants_.values()) {
+          proxy.rebind(filterFactory_);
+        }
+      }
+    }
+    
+    private void rebindPushServants(FilterFactory filterFactory_) {
+      synchronized (modifyProxiesLock_) {
+        for (AbstractProxy proxy : (Collection<AbstractProxy>)pushServants_.values()) {
+          proxy.rebind(filterFactory_);
+        }
+      }
+    }
+    
 }

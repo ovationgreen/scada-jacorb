@@ -21,13 +21,16 @@ package org.jacorb.notification;
  */
 
 import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jacorb.config.*;
-import org.slf4j.Logger;
+import org.jacorb.config.Configuration;
+import org.jacorb.notification.filter.FilterFactoryImpl;
 import org.jacorb.notification.interfaces.Disposable;
 import org.jacorb.notification.interfaces.FilterStage;
 import org.jacorb.notification.interfaces.FilterStageSource;
@@ -62,9 +65,7 @@ import org.omg.CosNotifyChannelAdmin.InterFilterGroupOperator;
 import org.omg.CosNotifyFilter.FilterFactory;
 import org.omg.PortableServer.POA;
 import org.picocontainer.MutablePicoContainer;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
 
 /**
  * @jmx.mbean
@@ -106,7 +107,7 @@ public abstract class AbstractEventChannel implements IServantLifecyle, JMXManag
 
     private final FilterStageListManager listManager_;
 
-    private final FilterFactory defaultFilterFactory_;
+    private final FilterFactoryImpl defaultFilterFactory_;
 
     /**
      * lock variable used to access allConsumerAdmins_ and consumerAdminServants_.
@@ -184,8 +185,7 @@ public abstract class AbstractEventChannel implements IServantLifecyle, JMXManag
 
     ////////////////////////////////////////
 
-    public AbstractEventChannel(IFactory factory, ORB orb, POA poa, Configuration config,
-            FilterFactory filterFactory)
+    public AbstractEventChannel(IFactory factory, ORB orb, POA poa, Configuration config, FilterFactoryImpl filterFactory)
     {
         super();
 
@@ -194,9 +194,10 @@ public abstract class AbstractEventChannel implements IServantLifecyle, JMXManag
         orb_ = orb;
         poa_ = poa;
         configuration_ = config;
+        
         defaultFilterFactory_ = filterFactory;
+        
         container_ = factory.getContainer();
-
         logger_ = ((org.jacorb.config.Configuration) config).getLogger(getClass().getName());
 
         container_.registerComponentImplementation(SubscriptionManager.class);
@@ -330,7 +331,7 @@ public abstract class AbstractEventChannel implements IServantLifecyle, JMXManag
      */
     public final FilterFactory default_filter_factory()
     {
-        return defaultFilterFactory_;
+        return defaultFilterFactory_.getFactory();
     }
 
     public final int[] get_all_consumeradmins()
@@ -793,5 +794,31 @@ public abstract class AbstractEventChannel implements IServantLifecyle, JMXManag
     {
         jmxCallback_ = callback;
     }
-}
 
+    public void rebind() {
+      logger_.info("Rebind event channel {0}", id_);
+      // Channel.
+      servantLifecyle_.deactivate();
+      servantLifecyle_.activate();
+      // Admins.
+      rebindConsumerAdmins();
+      rebindSupplierAdmins();
+    }
+
+    private void rebindConsumerAdmins() {
+      synchronized (modifyConsumerAdminsLock_) {
+        for (AbstractAdmin admin : (Collection<AbstractAdmin>)consumerAdminServants_.values()) {
+          admin.rebind(default_filter_factory());
+        }
+      }
+    }
+    
+    private void rebindSupplierAdmins() {
+      synchronized (modifySupplierAdminsLock_) {
+        for (AbstractAdmin admin : (Collection<AbstractAdmin>)supplierAdminServants_.values()) {
+          admin.rebind(default_filter_factory());
+        }
+      }
+    }
+    
+}
