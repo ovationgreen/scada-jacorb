@@ -158,7 +158,7 @@ public class ClientConnectionManager
     /**
      * Only used by Delegate for client-initiated connections.
      */
-    public synchronized void releaseConnection( ClientConnection connection )
+    public void releaseConnection( ClientConnection connection )
     {
         if ( connection.decClients() || connection.isClosed ())
         {
@@ -168,8 +168,11 @@ public class ClientConnectionManager
                               ( connection.isClosed () ? "closed connection " : "" ) +
                               connection.getGIOPConnection().toString());
             }
+            
             connection.close();
-            connections.remove(connection.getRegisteredProfile());
+            synchronized (this) {
+              connections.remove(connection.getRegisteredProfile());
+            }
         }
         else
         {
