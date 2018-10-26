@@ -69,15 +69,21 @@ public class PerClientPushTaskExecutor implements PushTaskExecutor {
     org.jacorb.orb.ORB orb = null;
     
     try {
-      Field[] fields = pushTask.getClass().getDeclaredFields();
-      for (Field field : fields) {
-        if (field.getName().contains("this")) {
-          field.setAccessible(true);
-          supplier = (AbstractProxyPushSupplier)field.get(pushTask);
+      if (pushTask instanceof AbstractRetryStrategy) {
+        AbstractRetryStrategy strategy = (AbstractRetryStrategy)pushTask;
+        supplier = (AbstractProxyPushSupplier)strategy.pushSupplier_;
+      }
+      else {
+        Field[] fields = pushTask.getClass().getDeclaredFields();
+        for (Field field : fields) {
+          if (field.getName().contains("this")) {
+            field.setAccessible(true);
+            supplier = (AbstractProxyPushSupplier)field.get(pushTask);
+          }
         }
       }
       if (supplier == null) {
-        throw new ReflectiveOperationException("Supplier not found.");
+        throw new ReflectiveOperationException("Supplier not found in task: " + pushTask);
       }
       
       Field field = AbstractProxy.class.getDeclaredField("client_");
