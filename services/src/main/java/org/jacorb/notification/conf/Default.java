@@ -50,7 +50,7 @@ public interface Default
 
     int DEFAULT_PULL_POOL_SIZE = 2;
 
-    String DEFAULT_THREADPOLICY = "ThreadPool";
+    String DEFAULT_THREADPOLICY = "ThreadPerClient"; // "ThreadPool";
 
     String DEFAULT_FILTER_FACTORY = "builtin";
 

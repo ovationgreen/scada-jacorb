@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.jacorb.notification.interfaces.Disposable;
 
+@SuppressWarnings("unused")
 public class DefaultPushTaskExecutor implements PushTaskExecutor, Disposable
 {
     private int noOfExecutors_ = 0;
@@ -45,6 +47,7 @@ public class DefaultPushTaskExecutor implements PushTaskExecutor, Disposable
            super(name);
         }
 
+        @Override
         public void run()
         {
             while (isActive_.get())
@@ -78,6 +81,7 @@ public class DefaultPushTaskExecutor implements PushTaskExecutor, Disposable
         startWorkers();
     }
 
+    @Override
     public void executePush(PushTaskExecutor.PushTask pushTask)
     {
         if (isActive_.get())
@@ -92,6 +96,7 @@ public class DefaultPushTaskExecutor implements PushTaskExecutor, Disposable
         }
     }
 
+    @Override
     public void dispose()
     {
         isActive_.set(false);

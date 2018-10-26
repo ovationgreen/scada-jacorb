@@ -21,9 +21,10 @@
 
 package org.jacorb.notification.container;
 
-import org.jacorb.config.*;
+import org.jacorb.config.Configuration;
 import org.jacorb.notification.conf.Attributes;
 import org.jacorb.notification.conf.Default;
+import org.jacorb.notification.engine.PerClientPushTaskExecutorFactory;
 import org.jacorb.notification.engine.PooledPushTaskExecutorFactory;
 import org.jacorb.notification.engine.PushTaskExecutorFactory;
 import org.picocontainer.ComponentAdapter;
@@ -32,32 +33,29 @@ import org.picocontainer.PicoInitializationException;
 import org.picocontainer.PicoIntrospectionException;
 import org.picocontainer.defaults.DecoratingComponentAdapter;
 
-public class PushTaskExecutorFactoryComponentAdapter extends DecoratingComponentAdapter
-{
-    private static final long serialVersionUID = 1L;
-
-    public PushTaskExecutorFactoryComponentAdapter(ComponentAdapter delegate)
-    {
-        super(delegate);
+public class PushTaskExecutorFactoryComponentAdapter extends DecoratingComponentAdapter {
+  
+  private static final long serialVersionUID = 1L;
+  
+  public PushTaskExecutorFactoryComponentAdapter(ComponentAdapter delegate) {
+    super(delegate);
+  }
+  
+  @Override
+  public Object getComponentInstance(PicoContainer container) throws PicoInitializationException, PicoIntrospectionException {
+    Configuration config = (Configuration)container.getComponentInstanceOfType(Configuration.class);
+    
+    String attribute = config.getAttribute(Attributes.THREADPOLICY, Default.DEFAULT_THREADPOLICY);
+    PushTaskExecutorFactory pushTaskExecutorFactory = (PushTaskExecutorFactory)super.getComponentInstance(container);
+    
+    if (attribute.equalsIgnoreCase("ThreadPool")) {
+      pushTaskExecutorFactory = new PooledPushTaskExecutorFactory(pushTaskExecutorFactory);
     }
-
-    public Object getComponentInstance(PicoContainer container) throws PicoInitializationException,
-            PicoIntrospectionException
-    {
-        Configuration config = (Configuration) container
-                .getComponentInstanceOfType(Configuration.class);
-
-        String attribute = config.getAttribute(Attributes.THREADPOLICY,
-                Default.DEFAULT_THREADPOLICY);
-
-        PushTaskExecutorFactory pushTaskExecutorFactory = (PushTaskExecutorFactory) super
-                .getComponentInstance(container);
-
-        if (attribute.equalsIgnoreCase("ThreadPool"))
-        {
-            pushTaskExecutorFactory = new PooledPushTaskExecutorFactory(pushTaskExecutorFactory);
-        }
-
-        return pushTaskExecutorFactory;
+    else if (attribute.equalsIgnoreCase("ThreadPerClient")) {
+      pushTaskExecutorFactory = new PerClientPushTaskExecutorFactory(pushTaskExecutorFactory);
     }
+    
+    return pushTaskExecutorFactory;
+  }
+  
 }
