@@ -572,6 +572,7 @@ public abstract class AbstractEventChannel implements IServantLifecyle, JMXManag
     protected AbstractAdmin getDefaultConsumerAdminServant()
     {
         AbstractAdmin _admin;
+        boolean created = false;
 
         synchronized (modifyConsumerAdminsLock_)
         {
@@ -589,8 +590,12 @@ public abstract class AbstractEventChannel implements IServantLifecyle, JMXManag
                     logger_.error("unable to set qos", e);
                 }
 
-                addToConsumerAdmins(_admin);
+                created = true;
             }
+        }
+        
+        if (created) {
+          addToConsumerAdmins(_admin);
         }
 
         return _admin;
@@ -607,17 +612,16 @@ public abstract class AbstractEventChannel implements IServantLifecyle, JMXManag
                 synchronized (modifyConsumerAdminsLock_)
                 {
                     consumerAdminServants_.remove(_key);
-                    listManager_.actionSourceModified();
                 }
+                listManager_.actionSourceModified();
             }
         });
 
         synchronized (modifyConsumerAdminsLock_)
         {
             consumerAdminServants_.put(_key, admin);
-
-            listManager_.actionSourceModified();
         }
+        listManager_.actionSourceModified();
     }
 
     protected AbstractAdmin new_for_consumers_servant(InterFilterGroupOperator filterGroupOperator,
@@ -697,6 +701,7 @@ public abstract class AbstractEventChannel implements IServantLifecyle, JMXManag
     protected AbstractAdmin getDefaultSupplierAdminServant()
     {
         AbstractAdmin _admin;
+        boolean created = false;
 
         synchronized (modifySupplierAdminsLock_)
         {
@@ -714,8 +719,12 @@ public abstract class AbstractEventChannel implements IServantLifecyle, JMXManag
                     logger_.error("unable to set qos", e);
                 }
 
-                addToSupplierAdmins(_admin);
+                created = true;
             }
+        }
+        
+        if (created) {
+          addToSupplierAdmins(_admin);
         }
 
         return _admin;
