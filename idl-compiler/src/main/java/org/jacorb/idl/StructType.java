@@ -532,6 +532,19 @@ public class StructType
             {
                 ps.println("\t\t" + type + " result = new " + type + "();");
             }
+            
+            {
+                ps.println("\t\tif (in instanceof org.jacorb.orb.CDRInputStream)");
+                ps.println("\t\t{");
+                ps.println("\t\t\torg.jacorb.orb.CDRInputStream cdr = (org.jacorb.orb.CDRInputStream) in;");
+                ps.println("\t\t\torg.jacorb.orb.HelperOverride<" + type + "> override;");
+                ps.println("\t\t\tif ((override = cdr.getOverride(" + className + "Helper.class)) != null)");
+                ps.println("\t\t\t{");
+                ps.println("\t\t\t\toverride.read(in, result);");
+                ps.println("\t\t\t\treturn result;");
+                ps.println("\t\t\t}");
+                ps.println("\t\t}");
+            }
 
             if (memberlist != null)
             {
@@ -564,6 +577,19 @@ public class StructType
         if (exc)
         {
             ps.println("\t\tout.write_string(id());");
+        }
+
+        {
+            ps.println("\t\tif (out instanceof org.jacorb.orb.CDROutputStream)");
+            ps.println("\t\t{");
+            ps.println("\t\t\torg.jacorb.orb.CDROutputStream cdr = (org.jacorb.orb.CDROutputStream) out;");
+            ps.println("\t\t\torg.jacorb.orb.HelperOverride<" + type + "> override;");
+            ps.println("\t\t\tif ((override = cdr.getOverride(" + className + "Helper.class)) != null)");
+            ps.println("\t\t\t{");
+            ps.println("\t\t\t\toverride.write(out, s);");
+            ps.println("\t\t\t\treturn;");
+            ps.println("\t\t\t}");
+            ps.println("\t\t}");
         }
 
         if (memberlist != null)

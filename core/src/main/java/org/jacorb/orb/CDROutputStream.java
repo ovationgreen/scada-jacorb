@@ -54,6 +54,8 @@ import org.omg.CORBA.portable.ValueOutputStream;
 import org.omg.IOP.IOR;
 import org.omg.IOP.IORHelper;
 import org.omg.IOP.TaggedProfile;
+import org.jacorb.orb.HelperOverrideHook;
+import org.jacorb.orb.HelperOverrideCreator;
 
 /**
  * @author Gerald Brose
@@ -177,6 +179,9 @@ public class CDROutputStream
 
     private final static DelegatingTypeCodeWriter typeCodeWriter = new DelegatingTypeCodeWriter();
 
+    public static HelperOverrideHook helperOverrideHook;
+    private HelperOverrideCreator helperOverrideCreator;
+
     /**
      * size selecting c'tor
      * @param orb must be a JacORB ORB
@@ -214,6 +219,9 @@ public class CDROutputStream
             buffer = bufMgr.getBuffer(bufferSize);
         }
 
+        if (helperOverrideHook != null) {
+            helperOverrideCreator = helperOverrideHook.create();
+        }
     }
 
     /**
@@ -2386,4 +2394,14 @@ public class CDROutputStream
     {
         return useIndirection;
     }
+    
+    public <T> HelperOverride<T> getOverride(Class<?> helperClass)
+    {
+        if (helperOverrideCreator != null)
+			  {
+				    return helperOverrideCreator.create(helperClass);
+		  	}
+        return null;
+    }
+    
 }

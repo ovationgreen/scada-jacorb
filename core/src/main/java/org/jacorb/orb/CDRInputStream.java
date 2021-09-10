@@ -53,6 +53,9 @@ import org.omg.CORBA.portable.IDLEntity;
 import org.omg.CORBA.portable.ValueInputStream;
 import org.omg.GIOP.MsgType_1_1;
 import org.slf4j.Logger;
+import org.jacorb.orb.HelperOverride;
+import org.jacorb.orb.HelperOverrideHook;
+import org.jacorb.orb.HelperOverrideCreator;
 
 /**
  * Read CDR encoded data
@@ -184,7 +187,9 @@ public class CDRInputStream
     private final TypeCodeCache typeCodeCache;
 
     private int typeCodeNestingLevel = -1;
-
+    
+    public static HelperOverrideHook helperOverrideHook;
+    private HelperOverrideCreator helperOverrideCreator;
 
     private CDRInputStream(org.omg.CORBA.ORB orb)
     {
@@ -214,6 +219,10 @@ public class CDRInputStream
         }
 
         typeCodeCache = ((ORBSingleton)this.orb).getTypeCodeCache();
+        
+        if (helperOverrideHook != null) {
+            helperOverrideCreator = helperOverrideHook.create();
+        }
     }
 
 
@@ -2943,4 +2952,14 @@ public class CDRInputStream
 
         handle_chunking ();
     }
+    
+    public <T> HelperOverride<T> getOverride(Class<?> helperClass)
+    {
+        if (helperOverrideCreator != null)
+			  {
+				    return helperOverrideCreator.create(helperClass);
+		  	}
+        return null;
+    }
+    
 }
