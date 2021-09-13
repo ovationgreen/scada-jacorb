@@ -423,7 +423,7 @@ public class StructType
 
         printClassComment((exc ? "exception" : "struct"), className, ps);
 
-        ps.println("public abstract class " + className + "Helper");
+        ps.println("public abstract class " + className + "Helper implements org.jacorb.orb.Helper<" + className + ">");
         ps.println("{");
         ps.println("\tprivate volatile static org.omg.CORBA.TypeCode _type;");
 

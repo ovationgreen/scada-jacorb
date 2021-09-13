@@ -2953,7 +2953,7 @@ public class CDRInputStream
         handle_chunking ();
     }
     
-    public <T> HelperOverride<T> getOverride(Class<?> helperClass)
+    public <T extends org.omg.CORBA.portable.IDLEntity> HelperOverride<T> getOverride(Class<? extends org.jacorb.orb.Helper<T>> helperClass)
     {
         if (helperOverrideCreator != null)
 			  {
