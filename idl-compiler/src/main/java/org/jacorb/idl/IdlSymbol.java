@@ -589,7 +589,7 @@ public class IdlSymbol
         return prefix;
     }
 
-    private String version()
+    protected String version()
     {
         IdlSymbol enc = this;
         String tmp;

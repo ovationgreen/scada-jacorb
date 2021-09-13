@@ -267,7 +267,7 @@ public class EnumType
 
         printClassComment("enum", className, ps);
 
-        ps.println("public abstract class " + className + "Helper");
+        ps.println("public abstract class " + className + "Helper implements org.jacorb.orb.Helper<" + className + ">");
         ps.println("{");
 
         ps.println("\tprivate volatile static org.omg.CORBA.TypeCode _type;");
@@ -295,11 +295,38 @@ public class EnumType
 
         ps.println("\tpublic static " + className + " read (final org.omg.CORBA.portable.InputStream in)");
         ps.println("\t{");
+        
+        if (Float.parseFloat(version()) > 1.0f) {
+            ps.println("\t\tif (in instanceof org.jacorb.orb.CDRInputStream)");
+            ps.println("\t\t{");
+            ps.println("\t\t\torg.jacorb.orb.CDRInputStream cdr = (org.jacorb.orb.CDRInputStream) in;");
+            ps.println("\t\t\torg.jacorb.orb.HelperOverride<" + className + "> override;");
+            ps.println("\t\t\tif ((override = cdr.getOverride(" + className + "Helper.class)) != null)");
+            ps.println("\t\t\t{");
+            ps.println("\t\t\t\treturn override.read(in);");
+            ps.println("\t\t\t}");
+            ps.println("\t\t}");
+        }
+        
         ps.println("\t\treturn " + className + ".from_int(in.read_long());");
         ps.println("\t}" + Environment.NL);
 
         ps.println("\tpublic static void write (final org.omg.CORBA.portable.OutputStream out, final " + className + " s)");
         ps.println("\t{");
+        
+        if (Float.parseFloat(version()) > 1.0f) {
+            ps.println("\t\tif (out instanceof org.jacorb.orb.CDROutputStream)");
+            ps.println("\t\t{");
+            ps.println("\t\t\torg.jacorb.orb.CDROutputStream cdr = (org.jacorb.orb.CDROutputStream) out;");
+            ps.println("\t\t\torg.jacorb.orb.HelperOverride<" + className + "> override;");
+            ps.println("\t\t\tif ((override = cdr.getOverride(" + className + "Helper.class)) != null)");
+            ps.println("\t\t\t{");
+            ps.println("\t\t\t\toverride.write(out, s);");
+            ps.println("\t\t\t\treturn;");
+            ps.println("\t\t\t}");
+            ps.println("\t\t}");
+        }
+        
         ps.println("\t\tout.write_long(s.value());");
         ps.println("\t}");
         

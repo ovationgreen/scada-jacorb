@@ -452,6 +452,18 @@ public class StructType
         ps.println("\tpublic static " + type +
                     " read (final org.omg.CORBA.portable.InputStream in)");
         ps.println("\t{");
+        
+        if (Float.parseFloat(version()) > 1.0f) {
+            ps.println("\t\tif (in instanceof org.jacorb.orb.CDRInputStream)");
+            ps.println("\t\t{");
+            ps.println("\t\t\torg.jacorb.orb.CDRInputStream cdr = (org.jacorb.orb.CDRInputStream) in;");
+            ps.println("\t\t\torg.jacorb.orb.HelperOverride<" + type + "> override;");
+            ps.println("\t\t\tif ((override = cdr.getOverride(" + className + "Helper.class)) != null)");
+            ps.println("\t\t\t{");
+            ps.println("\t\t\t\treturn override.read(in);");
+            ps.println("\t\t\t}");
+            ps.println("\t\t}");
+        }
 
         if (parser.hasObjectCachePlugin())
         {
@@ -532,19 +544,6 @@ public class StructType
             {
                 ps.println("\t\t" + type + " result = new " + type + "();");
             }
-            
-            {
-                ps.println("\t\tif (in instanceof org.jacorb.orb.CDRInputStream)");
-                ps.println("\t\t{");
-                ps.println("\t\t\torg.jacorb.orb.CDRInputStream cdr = (org.jacorb.orb.CDRInputStream) in;");
-                ps.println("\t\t\torg.jacorb.orb.HelperOverride<" + type + "> override;");
-                ps.println("\t\t\tif ((override = cdr.getOverride(" + className + "Helper.class)) != null)");
-                ps.println("\t\t\t{");
-                ps.println("\t\t\t\toverride.read(in, result);");
-                ps.println("\t\t\t\treturn result;");
-                ps.println("\t\t\t}");
-                ps.println("\t\t}");
-            }
 
             if (memberlist != null)
             {
@@ -573,13 +572,8 @@ public class StructType
         /* write */
         ps.println("\tpublic static void write (final org.omg.CORBA.portable.OutputStream out, final " + type + " s)");
         ps.println("\t{");
-
-        if (exc)
-        {
-            ps.println("\t\tout.write_string(id());");
-        }
-
-        {
+        
+        if (Float.parseFloat(version()) > 1.0f) {
             ps.println("\t\tif (out instanceof org.jacorb.orb.CDROutputStream)");
             ps.println("\t\t{");
             ps.println("\t\t\torg.jacorb.orb.CDROutputStream cdr = (org.jacorb.orb.CDROutputStream) out;");
@@ -590,6 +584,11 @@ public class StructType
             ps.println("\t\t\t\treturn;");
             ps.println("\t\t\t}");
             ps.println("\t\t}");
+        }
+
+        if (exc)
+        {
+            ps.println("\t\tout.write_string(id());");
         }
 
         if (memberlist != null)

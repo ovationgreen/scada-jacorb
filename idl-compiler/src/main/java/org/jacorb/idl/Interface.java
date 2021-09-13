@@ -846,7 +846,7 @@ public class Interface
 
         printClassComment("interface", name, ps);
 
-        ps.println("public abstract class " + name + "Helper");
+        ps.println("public abstract class " + name + "Helper implements org.jacorb.orb.Helper<" + name + ">");
         ps.println("{");
 
         ps.println("\tprivate volatile static org.omg.CORBA.TypeCode _type;");
@@ -936,6 +936,18 @@ public class Interface
         // Generate the read
         ps.println("\tpublic static " + name + " read(final org.omg.CORBA.portable.InputStream in)");
         ps.println("\t{");
+        
+        if (Float.parseFloat(version()) > 1.0f) {
+            ps.println("\t\tif (in instanceof org.jacorb.orb.CDRInputStream)");
+            ps.println("\t\t{");
+            ps.println("\t\t\torg.jacorb.orb.CDRInputStream cdr = (org.jacorb.orb.CDRInputStream) in;");
+            ps.println("\t\t\torg.jacorb.orb.HelperOverride<" + name + "> override;");
+            ps.println("\t\t\tif ((override = cdr.getOverride(" + name + "Helper.class)) != null)");
+            ps.println("\t\t\t{");
+            ps.println("\t\t\t\treturn override.read(in);");
+            ps.println("\t\t\t}");
+            ps.println("\t\t}");
+        }
 
         if (is_local)
         {
@@ -967,6 +979,19 @@ public class Interface
         // Generate the write
         ps.println("\tpublic static void write(final org.omg.CORBA.portable.OutputStream _out, final " + typeName() + " s)");
         ps.println("\t{");
+        
+        if (Float.parseFloat(version()) > 1.0f) {
+            ps.println("\t\tif (_out instanceof org.jacorb.orb.CDROutputStream)");
+            ps.println("\t\t{");
+            ps.println("\t\t\torg.jacorb.orb.CDROutputStream cdr = (org.jacorb.orb.CDROutputStream) _out;");
+            ps.println("\t\t\torg.jacorb.orb.HelperOverride<" + name + "> override;");
+            ps.println("\t\t\tif ((override = cdr.getOverride(" + name + "Helper.class)) != null)");
+            ps.println("\t\t\t{");
+            ps.println("\t\t\t\toverride.write(_out, s);");
+            ps.println("\t\t\t\treturn;");
+            ps.println("\t\t\t}");
+            ps.println("\t\t}");
+        }
 
         if (is_local)
         {

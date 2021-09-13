@@ -1044,6 +1044,18 @@ public class UnionType
 
         ps.println("\tpublic static " + className + " read (org.omg.CORBA.portable.InputStream in)");
         ps.println("\t{");
+        
+        if (Float.parseFloat(version()) > 1.0f) {
+            ps.println("\t\tif (in instanceof org.jacorb.orb.CDRInputStream)");
+            ps.println("\t\t{");
+            ps.println("\t\t\torg.jacorb.orb.CDRInputStream cdr = (org.jacorb.orb.CDRInputStream) in;");
+            ps.println("\t\t\torg.jacorb.orb.HelperOverride<" + className + "> override;");
+            ps.println("\t\t\tif ((override = cdr.getOverride(" + className + "Helper.class)) != null)");
+            ps.println("\t\t\t{");
+            ps.println("\t\t\t\treturn override.read(in);");
+            ps.println("\t\t\t}");
+            ps.println("\t\t}");
+        }
 
         if (parser.hasObjectCachePlugin())
         {
@@ -1053,19 +1065,6 @@ public class UnionType
         else
         {
             ps.println("\t\t" + className + " result = new " + className + "();");
-        }
-        
-        {
-            ps.println("\t\tif (in instanceof org.jacorb.orb.CDRInputStream)");
-            ps.println("\t\t{");
-            ps.println("\t\t\torg.jacorb.orb.CDRInputStream cdr = (org.jacorb.orb.CDRInputStream) in;");
-            ps.println("\t\t\torg.jacorb.orb.HelperOverride<" + className + "> override;");
-            ps.println("\t\t\tif ((override = cdr.getOverride(" + className + "Helper.class)) != null)");
-            ps.println("\t\t\t{");
-            ps.println("\t\t\t\toverride.read(in, result);");
-            ps.println("\t\t\t\treturn result;");
-            ps.println("\t\t\t}");
-            ps.println("\t\t}");
         }
 
         TypeSpec switch_ts_resolved = switch_type_spec;
@@ -1197,7 +1196,7 @@ public class UnionType
         ps.println ("\tpublic static void write (org.omg.CORBA.portable.OutputStream out, " + className + " s)");
         ps.println ("\t{");
         
-        {
+        if (Float.parseFloat(version()) > 1.0f) {
             ps.println("\t\tif (out instanceof org.jacorb.orb.CDROutputStream)");
             ps.println("\t\t{");
             ps.println("\t\t\torg.jacorb.orb.CDROutputStream cdr = (org.jacorb.orb.CDROutputStream) out;");
