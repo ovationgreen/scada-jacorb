@@ -220,9 +220,7 @@ public class CDRInputStream
 
         typeCodeCache = ((ORBSingleton)this.orb).getTypeCodeCache();
         
-        if (helperOverrideHook != null) {
-            helperOverrideCreator = helperOverrideHook.create();
-        }
+        initHelperOverrideCreator();
     }
 
 
@@ -2951,6 +2949,14 @@ public class CDRInputStream
         }
 
         handle_chunking ();
+    }
+    
+    public void initHelperOverrideCreator()
+    {
+        if (helperOverrideHook != null)
+        {
+            helperOverrideCreator = helperOverrideHook.create();
+        }
     }
     
     public <T extends org.omg.CORBA.portable.IDLEntity> HelperOverride<T> getOverride(Class<? extends org.jacorb.orb.Helper<T>> helperClass)

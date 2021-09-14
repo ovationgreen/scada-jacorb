@@ -219,9 +219,7 @@ public class CDROutputStream
             buffer = bufMgr.getBuffer(bufferSize);
         }
 
-        if (helperOverrideHook != null) {
-            helperOverrideCreator = helperOverrideHook.create();
-        }
+        initHelperOverrideCreator();
     }
 
     /**
@@ -2393,6 +2391,14 @@ public class CDROutputStream
     public boolean isIndirectionEnabled()
     {
         return useIndirection;
+    }
+    
+    public void initHelperOverrideCreator()
+    {
+        if (helperOverrideHook != null)
+        {
+            helperOverrideCreator = helperOverrideHook.create();
+        }
     }
     
     public <T extends org.omg.CORBA.portable.IDLEntity> HelperOverride<T> getOverride(Class<? extends org.jacorb.orb.Helper<T>> helperClass)
