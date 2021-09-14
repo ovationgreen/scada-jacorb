@@ -218,8 +218,6 @@ public class CDROutputStream
         {
             buffer = bufMgr.getBuffer(bufferSize);
         }
-
-        initHelperOverrideCreator();
     }
 
     /**
