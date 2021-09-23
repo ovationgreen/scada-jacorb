@@ -170,4 +170,10 @@ public class ReplyInputStream
         System.arraycopy (buffer, body_start, body, 0, body_length);
         return body;
     }
+    
+    public void initHelperOverrideCreator()
+    {
+        super.initHelperOverrideCreator();
+    }
+    
 }

@@ -253,6 +253,8 @@ public class RequestOutputStream
                 throw new MARSHAL( "Unknown GIOP minor: " + giop_minor );
             }
         }
+        
+        initHelperOverrideCreator();
     }
 
     public int requestId()
@@ -368,4 +370,10 @@ public class RequestOutputStream
             out.close();
         }
     }
+    
+    public void initHelperOverrideCreator()
+    {
+        super.initHelperOverrideCreator();
+    }
+    
 }

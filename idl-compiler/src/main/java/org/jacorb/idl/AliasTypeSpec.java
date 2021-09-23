@@ -492,6 +492,11 @@ public class AliasTypeSpec
         }
 
         ps.println("\t}" + Environment.NL);
+        
+        ps.println("\tpublic org.omg.CORBA.TypeCode typeCode ()");
+        ps.println("\t{");
+        ps.println("\t\treturn type ();");
+        ps.println("\t}");
 
         ps.println("\tpublic static org.omg.CORBA.TypeCode type ()");
         ps.println("\t{");

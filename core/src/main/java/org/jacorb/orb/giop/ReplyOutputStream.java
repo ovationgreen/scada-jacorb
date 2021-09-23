@@ -304,4 +304,10 @@ public class ReplyOutputStream
         }
         return result;
     }
+    
+    public void initHelperOverrideCreator()
+    {
+        super.initHelperOverrideCreator();
+    }
+    
 }

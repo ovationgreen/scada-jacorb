@@ -637,6 +637,11 @@ public class CDROutputStream
         {
             throw new MARSHAL("Cannot marshall null value.");
         }
+        if (helperOverrideCreator != null)
+        {
+            helperOverrideCreator.write_any( this, value );
+            return;
+        }
         write_TypeCode( value.type() );
         value.write_value( this ) ;
     }
@@ -2391,7 +2396,7 @@ public class CDROutputStream
         return useIndirection;
     }
     
-    public void initHelperOverrideCreator()
+    protected void initHelperOverrideCreator()
     {
         if (helperOverrideHook != null)
         {
@@ -2404,6 +2409,15 @@ public class CDROutputStream
         if (helperOverrideCreator != null)
 			  {
 				    return helperOverrideCreator.create(helperClass);
+		  	}
+        return null;
+    }
+    
+    public <T extends org.omg.CORBA.portable.IDLEntity> HelperOverride<T> getOverride(org.omg.CORBA.TypeCode type)
+    {
+        if (helperOverrideCreator != null)
+			  {
+				    return helperOverrideCreator.create(type);
 		  	}
         return null;
     }

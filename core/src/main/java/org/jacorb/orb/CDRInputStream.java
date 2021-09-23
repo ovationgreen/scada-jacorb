@@ -677,6 +677,10 @@ public class CDRInputStream
     @Override
     public final org.omg.CORBA.Any read_any()
     {
+        if (helperOverrideCreator != null)
+        {
+            return helperOverrideCreator.read_any( this );
+        }
         org.omg.CORBA.TypeCode _tc = read_TypeCode();
         org.omg.CORBA.Any any = orb.create_any();
         any.read_value( this, _tc );
@@ -2949,7 +2953,7 @@ public class CDRInputStream
         handle_chunking ();
     }
     
-    public void initHelperOverrideCreator()
+    protected void initHelperOverrideCreator()
     {
         if (helperOverrideHook != null)
         {
@@ -2962,6 +2966,15 @@ public class CDRInputStream
         if (helperOverrideCreator != null)
 			  {
 				    return helperOverrideCreator.create(helperClass);
+		  	}
+        return null;
+    }
+    
+    public <T extends org.omg.CORBA.portable.IDLEntity> HelperOverride<T> getOverride(org.omg.CORBA.TypeCode type)
+    {
+        if (helperOverrideCreator != null)
+			  {
+				    return helperOverrideCreator.create(type);
 		  	}
         return null;
     }

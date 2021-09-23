@@ -427,6 +427,11 @@ public class StructType
         ps.println("{");
         ps.println("\tprivate volatile static org.omg.CORBA.TypeCode _type;");
 
+        ps.println("\tpublic org.omg.CORBA.TypeCode typeCode ()");
+        ps.println("\t{");
+        ps.println("\t\treturn type ();");
+        ps.println("\t}");
+
         /* type() method */
         ps.println("\tpublic static org.omg.CORBA.TypeCode type ()");
         ps.println("\t{");

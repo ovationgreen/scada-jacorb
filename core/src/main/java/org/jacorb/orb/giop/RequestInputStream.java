@@ -206,4 +206,10 @@ public class RequestInputStream
     {
         return is_locate_request;
     }
+    
+    public void initHelperOverrideCreator()
+    {
+        super.initHelperOverrideCreator();
+    }
+    
 }
