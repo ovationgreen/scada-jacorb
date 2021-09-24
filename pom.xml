@@ -24,7 +24,7 @@
 
     <groupId>org.jacorb</groupId>
     <artifactId>jacorb-parent</artifactId>
-    <version>3.9.0.18</version>
+    <version>3.9.0.19</version>
     <packaging>pom</packaging>
 
     <name>JacORB</name>
@@ -101,7 +101,8 @@
             <dependency>
                 <groupId>org.jacorb</groupId>
                 <artifactId>jacorb-idl-compiler</artifactId>
-                <version>${project.version}</version>
+                <!--version>${project.version}</version-->
+                <version>3.9</version>
             </dependency>
             <dependency>
                 <groupId>org.jacorb</groupId>
@@ -441,7 +442,8 @@
                         <dependency>
                             <groupId>org.jacorb</groupId>
                             <artifactId>jacorb-idl-compiler</artifactId>
-                            <version>${project.version}</version>
+                            <!--version>${project.version}</version-->
+                            <version>3.9</version>
                         </dependency>
                     </dependencies>
                 </plugin>

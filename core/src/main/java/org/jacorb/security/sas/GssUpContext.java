@@ -36,6 +36,8 @@ import org.slf4j.Logger;
 public class GssUpContext
     implements ISASContext
 {
+    public static GssUpContext INSTANCE = new GssUpContext();
+    
     private Logger logger = null;
     private static String username = "";
     private static String password = "";
@@ -306,5 +308,10 @@ public class GssUpContext
         }
         //logger.error("Bailout - GSSUP");
         return null;
+    }
+    
+    public void setVersionHandshake(Thread thread, String helperVersionHandhsake)
+    {
+      // ...
     }
 }

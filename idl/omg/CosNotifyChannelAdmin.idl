@@ -236,6 +236,8 @@ module CosNotifyChannelAdmin {
 
       void resume_connection()
          raises(ConnectionAlreadyActive, NotConnected);
+         
+      void set_helpers_version_handshake_key(in wstring key);
 
    }; // SequenceProxyPushSupplier
 

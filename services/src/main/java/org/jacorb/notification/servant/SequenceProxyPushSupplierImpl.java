@@ -30,6 +30,7 @@ import org.jacorb.notification.engine.TaskProcessor;
 import org.jacorb.notification.interfaces.Message;
 import org.jacorb.notification.util.PropertySet;
 import org.jacorb.notification.util.PropertySetAdapter;
+import org.jacorb.security.sas.GssUpContext;
 import org.omg.CORBA.ORB;
 import org.omg.CosEventChannelAdmin.AlreadyConnected;
 import org.omg.CosEventChannelAdmin.TypeError;
@@ -145,6 +146,8 @@ public class SequenceProxyPushSupplierImpl extends AbstractProxyPushSupplier imp
     private final AtomicLong pacingInterval_ = new AtomicLong(0);
 
     private long timeSpent_ = 0;
+    
+    private String helperVersionHandhshake;
 
     public ProxyType MyType()
     {
@@ -240,10 +243,25 @@ public class SequenceProxyPushSupplierImpl extends AbstractProxyPushSupplier imp
     private void deliverPendingMessagesInternal(final StructuredEvent[] structuredEvents)
             throws Disconnected
     {
-        long now = System.currentTimeMillis();
-        sequencePushConsumer_.push_structured_events(structuredEvents);
-        timeSpent_ += (System.currentTimeMillis() - now);
-        resetErrorCounter();
+        String key = helperVersionHandhshake;
+        if (key != null)
+        {
+            GssUpContext.INSTANCE.setVersionHandshake(Thread.currentThread(), key);
+        }
+        try
+        {
+            long now = System.currentTimeMillis();
+            sequencePushConsumer_.push_structured_events(structuredEvents);
+            timeSpent_ += (System.currentTimeMillis() - now);
+            resetErrorCounter();
+        }
+        finally
+        {
+            if (key != null)
+            {
+                GssUpContext.INSTANCE.setVersionHandshake(Thread.currentThread(), null);
+            }
+        }
     }
 
     public void connect_sequence_push_consumer(SequencePushConsumer consumer)
@@ -382,4 +400,14 @@ public class SequenceProxyPushSupplierImpl extends AbstractProxyPushSupplier imp
     {
         return timeSpent_;
     }
+    
+    public void set_helpers_version_handshake_key(String key) {
+      helperVersionHandhshake = key;
+      
+      if (logger_.isInfoEnabled())
+      {
+          logger_.info("set helperVersionHandhshake=" + key);
+      }
+    }
+    
 }
