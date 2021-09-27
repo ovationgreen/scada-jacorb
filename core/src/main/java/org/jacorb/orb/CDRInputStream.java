@@ -189,7 +189,7 @@ public class CDRInputStream
     private int typeCodeNestingLevel = -1;
     
     public static HelperOverrideHook helperOverrideHook;
-    private HelperOverrideCreator helperOverrideCreator;
+    public HelperOverrideCreator helperOverrideCreator;
 
     private CDRInputStream(org.omg.CORBA.ORB orb)
     {
@@ -1341,14 +1341,17 @@ public class CDRInputStream
 
     public final org.omg.CORBA.TypeCode read_TypeCode(Map recursiveTCMap, Map repeatedTCMap)
     {
+        HelperOverrideCreator helperOverrideCreator_ = helperOverrideCreator;
         try
         {
+            helperOverrideCreator = null;
             ++typeCodeNestingLevel;
             return typeCodeReader.readTypeCode(logger, this, recursiveTCMap, repeatedTCMap);
         }
         finally
         {
             --typeCodeNestingLevel;
+            helperOverrideCreator = helperOverrideCreator_;
         }
     }
 
@@ -1708,6 +1711,25 @@ public class CDRInputStream
         }
 
         int kind = typeCode.kind().value();
+        
+        if (helperOverrideCreator != null)
+        {
+            switch (kind)
+            {
+                case TCKind._tk_struct:
+                case TCKind._tk_union:
+                case TCKind._tk_enum:
+                case TCKind._tk_alias:
+                case TCKind._tk_except:
+                {
+                    boolean accepted = helperOverrideCreator.read_value( this, typeCode, out );
+                    if (accepted)
+                    {
+                        return;
+                    }
+                }
+            }
+        }
 
         try
         {

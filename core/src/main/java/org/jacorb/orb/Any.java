@@ -1551,9 +1551,16 @@ public final class Any
                 checkStreamClass (output);
                 toUse = ((CDROutputStream) output).orb();
             }
+            
             checkStreamClass ((org.omg.CORBA.portable.OutputStream)value);
             CDROutputStream out = (CDROutputStream) value;
             final CDRInputStream in = new CDRInputStream(toUse, out.getBufferCopy ());
+            
+            if (output instanceof CDROutputStream)
+            {
+              CDROutputStream cdr = (CDROutputStream) output;
+              in.helperOverrideCreator = cdr.helperOverrideCreator;
+            }
 
             try
             {

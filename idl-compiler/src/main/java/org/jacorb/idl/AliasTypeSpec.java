@@ -443,7 +443,30 @@ public class AliasTypeSpec
 
         printClassComment("alias", className, ps);
 
-        ps.println("public abstract class " + className + "Helper");
+        if (originalType instanceof SequenceType)
+        {
+            SequenceType st = (SequenceType) originalType;
+            TypeSpec ts = st.elementTypeSpec();
+            while (ts instanceof AliasTypeSpec)
+            {
+              AliasTypeSpec ats = (AliasTypeSpec) ts;
+              ts = ats.originalType();
+            }
+            String etn = ts.typeName();
+            
+            if (!(ts instanceof BaseType) && !(ts instanceof SequenceType) && !etn.equals("java.lang.String"))
+            {
+                ps.println("public abstract class " + className + "Helper implements org.jacorb.orb.SeqHelper<" + etn + ">");
+            }
+            else
+            {
+                ps.println("public abstract class " + className + "Helper");
+            }
+        }
+        else 
+        {
+            ps.println("public abstract class " + className + "Helper");
+        }
         ps.println("{");
 
         ps.println("\tprivate volatile static org.omg.CORBA.TypeCode _type;" + Environment.NL);

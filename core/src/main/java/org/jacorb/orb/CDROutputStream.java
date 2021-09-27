@@ -180,7 +180,7 @@ public class CDROutputStream
     private final static DelegatingTypeCodeWriter typeCodeWriter = new DelegatingTypeCodeWriter();
 
     public static HelperOverrideHook helperOverrideHook;
-    private HelperOverrideCreator helperOverrideCreator;
+    public HelperOverrideCreator helperOverrideCreator;
 
     /**
      * size selecting c'tor
@@ -1258,7 +1258,7 @@ public class CDROutputStream
         {
             recursiveTCMap = new HashMap();
         }
-
+        
         try
         {
             write_TypeCode(typeCode, recursiveTCMap, repeatedTCMap);
@@ -1274,7 +1274,16 @@ public class CDROutputStream
                                       final Map recursiveTCMap,
                                       final Map repeatedTCMap)
     {
-        typeCodeWriter.writeTypeCode(typeCode, this, recursiveTCMap, repeatedTCMap);
+        HelperOverrideCreator helperOverrideCreator_ = helperOverrideCreator;
+        try
+        {
+            helperOverrideCreator = null;
+            typeCodeWriter.writeTypeCode(typeCode, this, recursiveTCMap, repeatedTCMap);
+        }
+        finally
+        {
+            helperOverrideCreator = helperOverrideCreator_;
+        }
     }
 
     @Override
@@ -1330,6 +1339,25 @@ public class CDROutputStream
         }
 
         int kind = typeCode.kind().value();
+        
+        if (helperOverrideCreator != null)
+        {
+            switch (kind)
+            {
+                case TCKind._tk_struct:
+                case TCKind._tk_union:
+                case TCKind._tk_enum:
+                case TCKind._tk_alias:
+                case TCKind._tk_except:
+                {
+                    boolean accepted = helperOverrideCreator.write_value( this, typeCode, input );
+                    if (accepted)
+                    {
+                        return;
+                    }
+                }
+            }
+        }
 
         try
         {

@@ -490,8 +490,24 @@ public class SequenceType
         printImport(out);
 
         printClassComment("sequence", className, out);
+        
+        TypeSpec ts = elementTypeSpec();
+        String etn = ts.typeName();
+        while (ts instanceof AliasTypeSpec)
+        {
+            AliasTypeSpec ats = (AliasTypeSpec) ts;
+            ts = ats.originalType();
+        }
 
-        out.println("public abstract class " + className + "Helper");
+        if (!(ts instanceof BaseType) && !(ts instanceof SequenceType) && !etn.equals("java.lang.String"))
+        {
+            out.println("public abstract class " + className + "Helper implements org.jacorb.orb.SeqHelper<" + etn + ">");
+        }
+        else
+        {
+            out.println("public abstract class " + className + "Helper");
+        }
+        
         out.println("{");
         out.println("\tprivate static org.omg.CORBA.TypeCode _type = " +
                    getTypeCodeExpression() + ";");
