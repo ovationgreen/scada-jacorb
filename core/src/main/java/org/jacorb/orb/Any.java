@@ -1238,6 +1238,11 @@ public final class Any
                 case TCKind._tk_enum:       // 17
                 {
                     CDROutputStream out = new CDROutputStream(orb);
+                    if (input instanceof CDRInputStream)
+                    {
+                        CDRInputStream cdr = (CDRInputStream) input;
+                        out.helperOverrideCreator = cdr.helperOverrideCreator;
+                    }
                     out.write_value(type, input);
                     value = out;
                     break;
@@ -1256,6 +1261,11 @@ public final class Any
                 case TCKind._tk_except:     // 22
                 {
                     CDROutputStream out = new CDROutputStream(orb);
+                    if (input instanceof CDRInputStream)
+                    {
+                        CDRInputStream cdr = (CDRInputStream) input;
+                        out.helperOverrideCreator = cdr.helperOverrideCreator;
+                    }
                     out.write_value(type, input);
                     value = out;
                     break;
