@@ -25,6 +25,8 @@ import org.jacorb.config.Configuration;
 import org.jacorb.config.ConfigurationException;
 import org.omg.CORBA.ORB;
 import org.omg.CSIIOP.CompoundSecMechList;
+import org.omg.GSSUP.InitialContextToken;
+import org.omg.GSSUP.InitialContextTokenHolder;
 import org.omg.IOP.Codec;
 
 public interface ISASContext
@@ -33,10 +35,10 @@ public interface ISASContext
     public String getMechOID();
 
     public void initClient();
-    public byte[] createClientContext(ORB orb, Codec codec, CompoundSecMechList csmList);
+    public byte[] createClientContext(ORB orb, Codec codec, CompoundSecMechList csmList, InitialContextTokenHolder token);
     public String getClientPrincipal();
 
     public void initTarget();
-    public boolean validateContext(ORB orb, Codec codec, byte[] contextToken);
-    public String getValidatedPrincipal();
+    public boolean validateContext(ORB orb, Codec codec, byte[] contextToken, InitialContextTokenHolder token);
+    public String getValidatedPrincipal(InitialContextToken token);
 }

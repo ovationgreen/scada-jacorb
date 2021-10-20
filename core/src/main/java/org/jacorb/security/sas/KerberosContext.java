@@ -31,6 +31,8 @@ import org.jacorb.config.ConfigurationException;
 import org.omg.CORBA.ORB;
 import org.omg.CSI.KRB5MechOID;
 import org.omg.CSIIOP.CompoundSecMechList;
+import org.omg.GSSUP.InitialContextToken;
+import org.omg.GSSUP.InitialContextTokenHolder;
 import org.omg.IOP.Codec;
 import org.slf4j.Logger;
 
@@ -45,6 +47,7 @@ public class KerberosContext
     private GSSCredential targetCreds = null;
     private GSSCredential clientCreds = null;
 
+    @Override
     public void configure(Configuration configuration)
         throws ConfigurationException
     {
@@ -52,6 +55,7 @@ public class KerberosContext
             configuration.getLogger("org.jacorb.security.sas.Kerberos.log.verbosity");
     }
 
+    @Override
     public void initClient()
     {
         try
@@ -69,12 +73,14 @@ public class KerberosContext
         }
     }
 
+    @Override
     public String getMechOID()
     {
         return KRB5MechOID.value.substring(4);
     }
 
-    public byte[] createClientContext(ORB orb, Codec codec, CompoundSecMechList csmList)
+    @Override
+    public byte[] createClientContext(ORB orb, Codec codec, CompoundSecMechList csmList, InitialContextTokenHolder token)
     {
         byte[] contextToken = new byte[0];
         if ( csmList != null )
@@ -107,6 +113,7 @@ public class KerberosContext
         return contextToken;
     }
 
+    @Override
     public String getClientPrincipal()
     {
         String principal = "";
@@ -130,6 +137,7 @@ public class KerberosContext
         return principal;
     }
 
+    @Override
     public void initTarget()
     {
         try
@@ -150,7 +158,8 @@ public class KerberosContext
         }
     }
 
-    public boolean validateContext(ORB orb, Codec codec, byte[] contextToken)
+    @Override
+    public boolean validateContext(ORB orb, Codec codec, byte[] contextToken, InitialContextTokenHolder holder)
     {
         byte[] token = null;
 
@@ -181,7 +190,8 @@ public class KerberosContext
         return true;
     }
 
-    public String getValidatedPrincipal()
+    @Override
+    public String getValidatedPrincipal(InitialContextToken token)
     {
         if (validatedContext == null)
         {

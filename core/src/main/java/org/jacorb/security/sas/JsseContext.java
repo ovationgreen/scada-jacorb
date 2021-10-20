@@ -32,6 +32,8 @@ import org.jacorb.orb.portableInterceptor.ServerRequestInfoImpl;
 import org.omg.CORBA.ORB;
 import org.omg.CSI.IdentityToken;
 import org.omg.CSIIOP.CompoundSecMechList;
+import org.omg.GSSUP.InitialContextToken;
+import org.omg.GSSUP.InitialContextTokenHolder;
 import org.omg.IOP.Codec;
 import org.omg.PortableInterceptor.ServerRequestInfo;
 import org.slf4j.Logger;
@@ -44,6 +46,7 @@ public class JsseContext
 
     private X509Certificate client_cert = null;
 
+    @Override
     public void configure(Configuration configuration)
         throws ConfigurationException
     {
@@ -55,6 +58,7 @@ public class JsseContext
         this.logger = logger;
     }
 
+    @SuppressWarnings("unused")
     public boolean validate(ServerRequestInfo ri, byte[] contextToken) 
     {
         client_cert = getClientCert(ri);
@@ -189,7 +193,8 @@ public class JsseContext
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#createContext(org.omg.PortableInterceptor.ClientRequestInfo)
      */
-    public byte[] createClientContext(ORB orb, Codec codec, CompoundSecMechList csmList) {
+    @Override
+    public byte[] createClientContext(ORB orb, Codec codec, CompoundSecMechList csmList, InitialContextTokenHolder holder) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -197,6 +202,7 @@ public class JsseContext
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#getCreatedPrincipal()
      */
+    @Override
     public String getClientPrincipal() {
         // TODO Auto-generated method stub
         return null;
@@ -205,7 +211,8 @@ public class JsseContext
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#validateContext(org.omg.PortableInterceptor.ServerRequestInfo, byte[])
      */
-    public boolean validateContext(ORB orb, Codec codec, byte[] contextToken) {
+    @Override
+    public boolean validateContext(ORB orb, Codec codec, byte[] contextToken, InitialContextTokenHolder holder) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -213,7 +220,8 @@ public class JsseContext
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#getValidatedPrincipal()
      */
-    public String getValidatedPrincipal() {
+    @Override
+    public String getValidatedPrincipal(InitialContextToken token) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -221,6 +229,7 @@ public class JsseContext
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#initClient()
      */
+    @Override
     public void initClient() {
         // TODO Auto-generated method stub
 
@@ -229,11 +238,13 @@ public class JsseContext
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#initTarget()
      */
+    @Override
     public void initTarget() {
         // TODO Auto-generated method stub
 
     }
 
+    @Override
     public String getMechOID() {
         return "";
     }
@@ -241,6 +252,7 @@ public class JsseContext
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#createIdentityToken(org.omg.PortableInterceptor.ClientRequestInfo, org.omg.CSIIOP.CompoundSecMechList)
      */
+    @SuppressWarnings("unused")
     public IdentityToken createIdentityToken(ORB orb, Codec codec, CompoundSecMechList csmList) {
         // TODO Auto-generated method stub
         return null;

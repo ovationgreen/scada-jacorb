@@ -30,6 +30,7 @@ import org.omg.CSIIOP.CompoundSecMechList;
 import org.omg.GSSUP.GSSUPMechOID;
 import org.omg.GSSUP.InitialContextToken;
 import org.omg.GSSUP.InitialContextTokenHelper;
+import org.omg.GSSUP.InitialContextTokenHolder;
 import org.omg.IOP.Codec;
 import org.slf4j.Logger;
 
@@ -38,6 +39,7 @@ public class GssUpContext
 {
     public static GssUpContext INSTANCE = new GssUpContext();
     
+    @SuppressWarnings("unused")
     private Logger logger = null;
     private static String username = "";
     private static String password = "";
@@ -55,6 +57,7 @@ public class GssUpContext
         }
     }
 
+    @Override
     public void configure(Configuration configuration)
         throws ConfigurationException
     {
@@ -67,6 +70,7 @@ public class GssUpContext
         GssUpContext.password = password;
     }
 
+    @Override
     public String getMechOID()
     {
         return GSSUPMechOID.value.substring(4);
@@ -75,7 +79,8 @@ public class GssUpContext
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#createContext(org.omg.PortableInterceptor.ClientRequestInfo)
      */
-    public byte[] createClientContext(ORB orb, Codec codec, CompoundSecMechList csmList)
+    @Override
+    public byte[] createClientContext(ORB orb, Codec codec, CompoundSecMechList csmList, InitialContextTokenHolder token)
     {
         byte[] contextToken;
         if ((csmList == null) || (csmList.mechanism_list == null) || (csmList.mechanism_list.length == 0))
@@ -88,16 +93,14 @@ public class GssUpContext
            contextToken = GssUpContext.encode(orb, codec, username, password,
                                               csmList.mechanism_list[0].as_context_mech.target_name);
         }
-
-
-
-        initialContextToken = GssUpContext.decode(orb, codec, contextToken);
+        initialContextToken = (token.value = GssUpContext.decode(orb, codec, contextToken));
         return contextToken;
     }
 
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#getCreatedPrincipal()
      */
+    @Override
     public String getClientPrincipal()
     {
         return username;
@@ -106,32 +109,40 @@ public class GssUpContext
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#validateContext(org.omg.PortableInterceptor.ServerRequestInfo, byte[])
      */
-    public boolean validateContext(ORB orb, Codec codec, byte[] contextToken)
+    @Override
+    public boolean validateContext(ORB orb, Codec codec, byte[] contextToken, InitialContextTokenHolder tokenHolder)
     {
-        initialContextToken = GssUpContext.decode(orb, codec, contextToken);
-        return (initialContextToken != null);
+        InitialContextToken token = GssUpContext.decode(orb, codec, contextToken);
+        tokenHolder.value = token;
+        initialContextToken = token;
+        return (token != null);
     }
 
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#getValidatedPrincipal()
      */
-    public String getValidatedPrincipal() {
-        if (initialContextToken == null) return null;
-        return new String(initialContextToken.username);
+    @Override
+    public String getValidatedPrincipal(InitialContextToken token) {
+        if (token == null) token = initialContextToken;
+        if (token == null) return null;
+        return new String(token.username);
     }
 
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#initClient()
      */
+    @Override
     public void initClient() {
     }
 
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#initTarget()
      */
+    @Override
     public void initTarget() {
     }
 
+    @SuppressWarnings("hiding")
     public static byte[] encode(ORB orb, Codec codec, String username, String password, byte[] target_name)
     {
         InitialContextToken subject = null;
@@ -229,11 +240,13 @@ public class GssUpContext
         return completeContext;
     }
 
+    @SuppressWarnings("hiding")
     public static byte[] encode(ORB orb, Codec codec, String username, char[] password, String target_name)
     {
         return encode(orb, codec, username, new String(password), target_name.getBytes());
     }
 
+    @SuppressWarnings("unused")
     public static InitialContextToken decode(ORB orb, Codec codec, byte[] gssToken)
     {
         if(gssToken[0] != 0x60)
@@ -310,6 +323,7 @@ public class GssUpContext
         return null;
     }
     
+    @SuppressWarnings("unused")
     public void setVersionHandshake(Thread thread, String helperVersionHandhsake)
     {
       // ...

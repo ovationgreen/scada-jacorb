@@ -41,16 +41,19 @@ public class SASPolicyImpl extends org.omg.CORBA.LocalObject implements SASPolic
         this.value = SASPolicyValuesHelper.extract (value);
     }
 
+    @Override
     public SASPolicyValues value()
     {
         return value;
     }
 
+    @Override
     public int policy_type()
     {
         return SAS_POLICY_TYPE.value;
     }
 
+    @Override
     public Policy copy()
     {
         SASPolicyValues copy_values =
@@ -60,6 +63,7 @@ public class SASPolicyImpl extends org.omg.CORBA.LocalObject implements SASPolic
         return new SASPolicyImpl (copy_values);
     }
 
+    @Override
     public void destroy()
     {
     }

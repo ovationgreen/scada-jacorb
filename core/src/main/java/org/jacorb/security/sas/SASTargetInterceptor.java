@@ -21,6 +21,7 @@ package org.jacorb.security.sas;
  */
 
 import java.util.Hashtable;
+
 import org.jacorb.config.Configurable;
 import org.jacorb.config.Configuration;
 import org.jacorb.config.ConfigurationException;
@@ -46,6 +47,7 @@ import org.omg.CSI.MTMessageInContext;
 import org.omg.CSI.MessageInContext;
 import org.omg.CSI.SASContextBody;
 import org.omg.CSI.SASContextBodyHelper;
+import org.omg.GSSUP.InitialContextTokenHolder;
 import org.omg.IOP.Codec;
 import org.omg.IOP.ENCODING_CDR_ENCAPS;
 import org.omg.IOP.Encoding;
@@ -96,6 +98,7 @@ public class SASTargetInterceptor
         configure( orb.getConfiguration());
     }
 
+    @Override
     public void configure(Configuration configuration)
         throws ConfigurationException
     {
@@ -138,15 +141,18 @@ public class SASTargetInterceptor
         sasContext.initTarget();
     }
 
+    @Override
     public String name()
     {
         return name;
     }
 
+    @Override
     public void destroy()
     {
     }
 
+    @Override
     public void receive_request_service_contexts( ServerRequestInfo sri )
         throws ForwardRequest
     {
@@ -259,14 +265,15 @@ public class SASTargetInterceptor
                 client_context_id = msg.client_context_id;
                 contextToken = msg.client_authentication_token;
 
-                if (!sasContext.validateContext(orb, codec, contextToken)) {
+                InitialContextTokenHolder token = new InitialContextTokenHolder();
+                if (!sasContext.validateContext(orb, codec, contextToken, token)) {
                     logger.info("Could not validate context EstablishContext " + ri.operation());
                     makeContextError(ri, client_context_id, 1, 1, contextToken);
                     throw new org.omg.CORBA.NO_PERMISSION("SAS Error validating context",
                                                           MinorCodes.SAS_TSS_FAILURE,
                                                           CompletionStatus.COMPLETED_NO);
                 }
-                principalName = sasContext.getValidatedPrincipal();
+                principalName = sasContext.getValidatedPrincipal(token.value);
             }
             catch (org.omg.CORBA.NO_PERMISSION e)
             {
@@ -320,6 +327,7 @@ public class SASTargetInterceptor
         }
     }
 
+    @Override
     public void receive_request( ServerRequestInfo sri )
         throws ForwardRequest
     {
@@ -367,6 +375,7 @@ public class SASTargetInterceptor
         if (sasValues.targetRequires == 0 && sasValues.targetSupports == 0)
             return;
 
+        @SuppressWarnings("unused")
         ATLASPolicyValues atlasValues = null;
         try
         {
@@ -479,7 +488,7 @@ public class SASTargetInterceptor
                 client_context_id = msg.client_context_id;
                 contextToken = msg.client_authentication_token;
 
-                principalName = sasContext.getValidatedPrincipal();
+                principalName = sasContext.getValidatedPrincipal(null);
             }
             catch (org.omg.CORBA.NO_PERMISSION e)
             {
@@ -531,6 +540,7 @@ public class SASTargetInterceptor
         }
     }
 
+    @Override
     public void send_reply( ServerRequestInfo ri )
     {
         if (logger.isDebugEnabled())
@@ -573,6 +583,7 @@ public class SASTargetInterceptor
         */
     }
 
+    @Override
     public void send_exception( ServerRequestInfo ri )
         throws ForwardRequest
     {
@@ -619,6 +630,7 @@ public class SASTargetInterceptor
         */
     }
 
+    @Override
     public void send_other( ServerRequestInfo ri )
         throws ForwardRequest
     {
@@ -688,6 +700,7 @@ public class SASTargetInterceptor
         }
     }
 
+    @SuppressWarnings("rawtypes")
     public void cacheSASContext(GIOPConnection connection,
                                 long client_context_id,
                                 byte[] client_authentication_token,
@@ -707,6 +720,7 @@ public class SASTargetInterceptor
         }
     }
 
+    @SuppressWarnings("rawtypes")
     public void purgeSASContext(GIOPConnection connection, long client_context_id)
     {
         synchronized ( connection )
@@ -721,6 +735,7 @@ public class SASTargetInterceptor
         }
     }
 
+    @SuppressWarnings("rawtypes")
     public byte[] getSASContext(GIOPConnection connection, long client_context_id)
     {
         Long key = new Long(client_context_id);
@@ -738,6 +753,7 @@ public class SASTargetInterceptor
         }
     }
 
+    @SuppressWarnings("rawtypes")
     public String getSASContextPrincipalName(GIOPConnection connection,
                                              long client_context_id)
     {

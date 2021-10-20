@@ -22,6 +22,7 @@ package org.jacorb.security.sas;
 
 import java.net.URLDecoder;
 import java.util.Hashtable;
+
 import org.jacorb.config.Configurable;
 import org.jacorb.config.Configuration;
 import org.jacorb.config.ConfigurationException;
@@ -51,6 +52,7 @@ import org.omg.CSI.SASContextBodyHelper;
 import org.omg.CSIIOP.CompoundSecMechList;
 import org.omg.CSIIOP.CompoundSecMechListHelper;
 import org.omg.CSIIOP.ServiceConfiguration;
+import org.omg.GSSUP.InitialContextTokenHolder;
 import org.omg.IOP.Codec;
 import org.omg.IOP.ENCODING_CDR_ENCAPS;
 import org.omg.IOP.Encoding;
@@ -97,6 +99,7 @@ public class SASClientInterceptor
         configure( orb.getConfiguration());
     }
 
+    @Override
     public void configure(Configuration configuration)
         throws ConfigurationException
     {
@@ -143,15 +146,18 @@ public class SASClientInterceptor
         this.contextToken = contextToken;
     }
 
+    @Override
     public String name()
     {
         return name;
     }
 
+    @Override
     public void destroy()
     {
     }
 
+    @Override
     public void send_request(org.omg.PortableInterceptor.ClientRequestInfo cri)
         throws org.omg.PortableInterceptor.ForwardRequest
     {
@@ -221,7 +227,8 @@ public class SASClientInterceptor
             {
                 IdentityToken identityToken = new IdentityToken();
                 identityToken.absent(true);
-                contextToken = sasContext.createClientContext(orb, codec, csmList);
+                InitialContextTokenHolder token = new InitialContextTokenHolder();
+                contextToken = sasContext.createClientContext(orb, codec, csmList, token);
                 msg = makeEstablishContext(orb,
                                            -client_context_id,
                                            authorizationList,
@@ -244,10 +251,12 @@ public class SASClientInterceptor
         }
     }
 
+    @Override
     public void send_poll(org.omg.PortableInterceptor.ClientRequestInfo ri)
     {
     }
 
+    @Override
     public void receive_reply(org.omg.PortableInterceptor.ClientRequestInfo cri)
     {
         ClientRequestInfoImpl ri = (ClientRequestInfoImpl)cri;
@@ -312,6 +321,7 @@ public class SASClientInterceptor
         }
     }
 
+    @Override
     public void receive_exception(org.omg.PortableInterceptor.ClientRequestInfo cri)
         throws org.omg.PortableInterceptor.ForwardRequest
     {
@@ -381,6 +391,7 @@ public class SASClientInterceptor
         }
     }
 
+    @Override
     public void receive_other(org.omg.PortableInterceptor.ClientRequestInfo ri)
         throws org.omg.PortableInterceptor.ForwardRequest
     {

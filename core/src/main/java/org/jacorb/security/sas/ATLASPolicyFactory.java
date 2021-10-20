@@ -29,6 +29,7 @@ import org.omg.PortableInterceptor.PolicyFactory;
 
 public class ATLASPolicyFactory extends org.omg.CORBA.LocalObject implements PolicyFactory
 {
+    @Override
     public Policy create_policy( int type, Any value )
         throws PolicyError
     {

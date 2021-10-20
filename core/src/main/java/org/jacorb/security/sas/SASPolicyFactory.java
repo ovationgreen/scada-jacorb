@@ -29,7 +29,8 @@ import org.omg.PortableInterceptor.PolicyFactory;
 
 public class SASPolicyFactory extends org.omg.CORBA.LocalObject implements PolicyFactory
 {
-     public Policy create_policy( int type, Any value )
+     @Override
+    public Policy create_policy( int type, Any value )
         throws PolicyError
     {
         if( type != SAS_POLICY_TYPE.value )

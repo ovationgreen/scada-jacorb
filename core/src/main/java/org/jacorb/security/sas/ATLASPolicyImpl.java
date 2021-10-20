@@ -41,16 +41,19 @@ public class ATLASPolicyImpl extends org.omg.CORBA.LocalObject implements ATLASP
         this.value = ATLASPolicyValuesHelper.extract (value);
     }
 
+    @Override
     public ATLASPolicyValues value()
     {
         return value;
     }
 
+    @Override
     public int policy_type()
     {
         return ATLAS_POLICY_TYPE.value;
     }
 
+    @Override
     public Policy copy()
     {
         ATLASPolicyValues copy_values =
@@ -59,6 +62,7 @@ public class ATLASPolicyImpl extends org.omg.CORBA.LocalObject implements ATLASP
         return new ATLASPolicyImpl (copy_values);
     }
 
+    @Override
     public void destroy()
     {
     }

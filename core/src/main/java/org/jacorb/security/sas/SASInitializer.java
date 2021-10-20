@@ -47,6 +47,7 @@ public class SASInitializer
     /**
      * This method registers the interceptors.
      */
+    @Override
     public void post_init( ORBInitInfo info )
     {
         org.jacorb.orb.ORB orb =
@@ -113,6 +114,7 @@ public class SASInitializer
         info.register_policy_factory( ATLAS_POLICY_TYPE.value, new ATLASPolicyFactory() );
     }
 
+    @Override
     public void pre_init(ORBInitInfo info)
     {
     }

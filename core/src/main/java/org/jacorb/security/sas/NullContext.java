@@ -19,21 +19,25 @@ package org.jacorb.security.sas;
  *   License along with this library; if not, write to the Free
  *   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
-import org.jacorb.config.*;
+import org.jacorb.config.Configuration;
+import org.jacorb.config.ConfigurationException;
 import org.omg.CORBA.ORB;
 import org.omg.CSIIOP.CompoundSecMechList;
+import org.omg.GSSUP.InitialContextToken;
+import org.omg.GSSUP.InitialContextTokenHolder;
 import org.omg.IOP.Codec;
 
 public class NullContext 
     implements ISASContext
 {
 
+    @Override
     public void configure(Configuration configuration)
         throws ConfigurationException
     {
     }
 
+    @Override
     public String getMechOID() {
         return "";
     }
@@ -41,13 +45,15 @@ public class NullContext
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#createContext(org.omg.PortableInterceptor.ClientRequestInfo)
      */
-    public byte[] createClientContext(ORB orb, Codec codec, CompoundSecMechList csmList) {
+    @Override
+    public byte[] createClientContext(ORB orb, Codec codec, CompoundSecMechList csmList, InitialContextTokenHolder token) {
         return new byte[0];
     }
 
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#getCreatedPrincipal()
      */
+    @Override
     public String getClientPrincipal() {
         return "";
     }
@@ -55,26 +61,30 @@ public class NullContext
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#validateContext(org.omg.PortableInterceptor.ServerRequestInfo, byte[])
      */
-    public boolean validateContext(ORB orb, Codec codec, byte[] contextToken) {
+    @Override
+    public boolean validateContext(ORB orb, Codec codec, byte[] contextToken, InitialContextTokenHolder token) {
         return true;
     }
 
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#getValidatedPrincipal()
      */
-    public String getValidatedPrincipal() {
+    @Override
+    public String getValidatedPrincipal(InitialContextToken token) {
         return "";
     }
 
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#initClient()
      */
+    @Override
     public void initClient() {
     }
 
     /* (non-Javadoc)
      * @see org.jacorb.security.sas.ISASContext#initTarget()
      */
+    @Override
     public void initTarget() {
     }
 }
