@@ -577,7 +577,7 @@ public class Interface
                     ps.print(", org.omg.CORBA.Object, org.omg.CORBA.portable.IDLEntity");
                 }
             }
-
+            
             if (inheritanceSpec.v.size() > 0)
             {
                 Enumeration e = inheritanceSpec.v.elements();
@@ -598,6 +598,8 @@ public class Interface
             }
         }
 
+        ps.print(", org.jacorb.orb.Operations");
+        
         ps.println(Environment.NL + "{");
 
         if(is_pseudo)
@@ -677,8 +679,15 @@ public class Interface
                 }
             }
             while (e.hasMoreElements());
-
+            
+            // ps.print(" , ");
+            // ps.print("org.jacorb.orb.Operations");
             ps.print(Environment.NL);
+        }
+        else {
+          // ps.print("\textends ");
+          // ps.print("org.jacorb.orb.Operations");
+          ps.print(Environment.NL);
         }
 
         ps.println("{");
@@ -1140,7 +1149,7 @@ public class Interface
         printClassComment("interface", name, ps);
 
         ps.println("public class _" + name + "Stub");
-        ps.println("\textends org.omg.CORBA.portable.ObjectImpl");
+        ps.println("\textends org.jacorb.orb.ObjectStub<" + name + ">");
 
         ps.println("\timplements " + javaName());
         ps.println("{");
@@ -1209,7 +1218,7 @@ public class Interface
             ps.println("\t}" + Environment.NL);
         }
 
-        body.printStubMethods(ps, name, is_local, is_abstract);
+        body.printStubMethods(ps, name, is_local, is_abstract, Float.parseFloat(version()));
 
         ps.println("}");
         ps.close();
@@ -1228,8 +1237,8 @@ public class Interface
         printClassComment("interface", name, ps);
 
         ps.print("public abstract class " + name + "POA" + Environment.NL);
-        ps.println("\textends org.omg.PortableServer.Servant");
-        ps.println("\timplements org.omg.CORBA.portable.InvokeHandler, " + javaName() + "Operations");
+        ps.println("\textends org.jacorb.orb.ServantPOA<" + javaName() + ">");
+        ps.println("\timplements org.omg.CORBA.portable.InvokeHandler, " + javaName() + "Operations, org.jacorb.orb.Operations");
         ps.println("{");
 
         body.printOperationsHash(ps);
@@ -1244,6 +1253,7 @@ public class Interface
 
         ps.println("\"" + ids[ ids.length - 1 ] + "\"};");
 
+        ps.println("\tpublic static org.jacorb.orb.OperationsOverride<" + javaName() + "> override;");
 
         ps.println("\tpublic " + javaName() + " _this()");
 
@@ -1275,6 +1285,23 @@ public class Interface
         {
             ps.println("\t\torg.omg.CORBA.portable.OutputStream _out = null;");
 
+            ps.println("\t\t// compatibility code");
+            
+            if (Float.parseFloat(version()) > 1.0f) {
+              ps.println("\t\tif (operationsOverrideHook != null) {");
+              ps.println("\t\t\torg.jacorb.orb.OperationsOverrideCreator operationsOverrideCreator = operationsOverrideHook.create();");
+              ps.println("\t\t\tif (operationsOverrideCreator != null) {");
+              ps.println("\t\t\t\torg.jacorb.orb.OperationsOverride<" + name + "> operationsOverride = operationsOverrideCreator.create(" + name + "Helper.class);");
+              ps.println("\t\t\t\tif (operationsOverride != null) {");
+              ps.println("\t\t\t\t\t_out = operationsOverride._invoke(method, _input, handler);");
+              ps.println("\t\t\t\t\tif (_out != null) {");
+              ps.println("\t\t\t\t\t\treturn _out;");
+              ps.println("\t\t\t\t\t}");
+              ps.println("\t\t\t\t}");
+              ps.println("\t\t\t}");
+              ps.println("\t\t}");
+            }
+            
             ps.println("\t\t// do something");
         }
 

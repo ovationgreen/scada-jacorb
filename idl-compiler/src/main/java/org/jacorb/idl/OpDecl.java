@@ -250,7 +250,8 @@ public class OpDecl
                                  String classname,
                                  String idl_name,
                                  boolean is_local,
-                                 boolean is_abstract)
+                                 boolean is_abstract,
+                                 float version )
     {
         ps.println( "\t\twhile(true)" );
         ps.println( "\t\t{" );
@@ -264,6 +265,34 @@ public class OpDecl
             ps.println( "\t\t\t\torg.omg.CORBA.portable.OutputStream _os = null;" );
             ps.println( "\t\t\t\ttry" );
             ps.println( "\t\t\t\t{" );
+            
+            if( version > 1.0f ) {
+              String interfaceName = classname.replaceFirst("Operation", "");
+              ps.println("\t\t\t\t\tif (operationsOverrideHook != null) {");
+              ps.println("\t\t\t\t\t\torg.jacorb.orb.OperationsOverrideCreator operationsOverrideCreator = operationsOverrideHook.create();");
+              ps.println("\t\t\t\t\t\tif (operationsOverrideCreator != null) {");
+              ps.println("\t\t\t\t\t\t\torg.jacorb.orb.OperationsOverride<" + interfaceName + "> operationsOverride = operationsOverrideCreator.create(" + interfaceName + "Helper.class);");
+              ps.println("\t\t\t\t\t\t\tif (operationsOverride != null) {");
+              ps.println("\t\t\t\t\t\t\t\tjava.util.concurrent.atomic.AtomicBoolean overridden = new java.util.concurrent.atomic.AtomicBoolean();");
+              if( opAttribute == 0 && !( opTypeSpec.typeSpec() instanceof VoidTypeSpec ) )
+              {
+                ps.println("\t\t\t\t\t\t\t\t" + opTypeSpec.toString() + " _result = operationsOverride._invoke(\"" + idl_name + "\", " + (opAttribute == NO_ATTRIBUTE) + ", this::_request, this::_invoke, overridden);");
+                ps.println("\t\t\t\t\t\t\t\tif (overridden.get()) {");
+                ps.println("\t\t\t\t\t\t\t\t\treturn _result;");
+                ps.println("\t\t\t\t\t\t\t\t}");
+              }
+              else
+              {
+                ps.println("\t\t\t\t\t\t\t\toperationsOverride._invoke(\"" + idl_name + "\", " + (opAttribute == NO_ATTRIBUTE) + ", this::_request, this::_invoke, overridden);");
+                ps.println("\t\t\t\t\t\t\t\tif (overridden.get()) {");
+                ps.println("\t\t\t\t\t\t\t\t\treturn;");
+                ps.println("\t\t\t\t\t\t\t\t}");
+              }
+              ps.println("\t\t\t\t\t\t\t}");
+              ps.println("\t\t\t\t\t\t}");
+              ps.println("\t\t\t\t\t}");
+            }
+            
             ps.print( "\t\t\t\t\t_os = _request( \"" + idl_name + "\"," );
 
             if( opAttribute == NO_ATTRIBUTE )
@@ -614,7 +643,8 @@ public class OpDecl
     public void printMethod( PrintWriter ps,
                              String classname,
                              boolean is_local,
-                             boolean is_abstract)
+                             boolean is_abstract,
+                             float version )
     {
         /* in some cases generated name have an underscore prepended for the
            mapped java name. On the wire, we must use the original name */
@@ -643,7 +673,7 @@ public class OpDecl
         }
         else
         {
-            printStreamBody(ps, classname, idl_name, is_local, is_abstract);
+            printStreamBody(ps, classname, idl_name, is_local, is_abstract, version);
         }
 
          ps.println( "\t}" + Environment.NL ); // end method^M

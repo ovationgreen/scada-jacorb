@@ -112,7 +112,7 @@ public class Method
     }
 
 
-    public void printMethod( PrintWriter ps, String classname, boolean is_local, boolean is_abstract )
+    public void printMethod( PrintWriter ps, String classname, boolean is_local, boolean is_abstract, float version )
     {
         ps.print( "\tpublic " );
 
@@ -139,6 +139,7 @@ public class Method
 
                 ps.println( "\t\t\t\ttry" );
                 ps.println( "\t\t\t\t{" );
+                
                 ps.println( "\t\t\t\t\t_os = _request(\"_get_" + name + "\",true);" );
                 ps.println( "\t\t\t\t\t_is = _invoke(_os);" );
                 TypeSpec ts = resultType.typeSpec();

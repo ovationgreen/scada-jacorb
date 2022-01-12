@@ -52,7 +52,7 @@ public interface Operation
      * @param is_abstract a <code>boolean</code> value used by Interface to
      *        denote an abstract.
      */
-    public void printMethod( PrintWriter ps, String classname, boolean is_local, boolean is_abstract );
+    public void printMethod( PrintWriter ps, String classname, boolean is_local, boolean is_abstract, float version );
 
     public void print_sendc_Method( PrintWriter ps, String classname );
 

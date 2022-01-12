@@ -305,12 +305,13 @@ public class InterfaceBody
     public void printStubMethods( PrintWriter ps,
                                   String classname,
                                   boolean is_local,
-                                  boolean is_abstract)
+                                  boolean is_abstract,
+                                  float version)
     {
         Operation[] ops = getMethods();
         for( int i = 0; i < ops.length; i++ )
         {
-            ops[ i ].printMethod( ps, classname, is_local, is_abstract );
+            ops[ i ].printMethod( ps, classname, is_local, is_abstract, version );
         }
 
         if ( parser.generate_ami_callback &&
