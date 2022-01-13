@@ -680,13 +680,13 @@ public class Interface
             }
             while (e.hasMoreElements());
             
-            // ps.print(" , ");
-            // ps.print("org.jacorb.orb.Operations");
+            ps.print(" , ");
+            ps.print("org.jacorb.orb.OperationsBase");
             ps.print(Environment.NL);
         }
         else {
-          // ps.print("\textends ");
-          // ps.print("org.jacorb.orb.Operations");
+          ps.print("\textends ");
+          ps.print("org.jacorb.orb.OperationsBase");
           ps.print(Environment.NL);
         }
 
@@ -1293,7 +1293,7 @@ public class Interface
               ps.println("\t\t\tif (operationsOverrideCreator != null) {");
               ps.println("\t\t\t\torg.jacorb.orb.OperationsOverride<" + name + "> operationsOverride = operationsOverrideCreator.create(" + name + "Helper.class);");
               ps.println("\t\t\t\tif (operationsOverride != null) {");
-              ps.println("\t\t\t\t\t_out = operationsOverride._invoke(method, _input, handler);");
+              ps.println("\t\t\t\t\t_out = operationsOverride._invoke(method, _input, handler, this);");
               ps.println("\t\t\t\t\tif (_out != null) {");
               ps.println("\t\t\t\t\t\treturn _out;");
               ps.println("\t\t\t\t\t}");

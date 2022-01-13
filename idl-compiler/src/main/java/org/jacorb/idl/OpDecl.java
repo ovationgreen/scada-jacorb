@@ -276,14 +276,28 @@ public class OpDecl
               ps.println("\t\t\t\t\t\t\t\tjava.util.concurrent.atomic.AtomicBoolean overridden = new java.util.concurrent.atomic.AtomicBoolean();");
               if( opAttribute == 0 && !( opTypeSpec.typeSpec() instanceof VoidTypeSpec ) )
               {
-                ps.println("\t\t\t\t\t\t\t\t" + opTypeSpec.toString() + " _result = operationsOverride._invoke(\"" + idl_name + "\", " + (opAttribute == NO_ATTRIBUTE) + ", this::_request, this::_invoke, overridden);");
+                ps.print("\t\t\t\t\t\t\t\t" + opTypeSpec.toString() + " _result = operationsOverride._invoke(\"" + idl_name + "\", " + (opAttribute == NO_ATTRIBUTE) + ", this::_request, this::_invoke, overridden");
+                for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); ) {
+                  ParamDecl p = ( (ParamDecl)e.nextElement() );
+                  if (p.paramAttribute != ParamDecl.MODE_OUT) {
+                    ps.print(", " + p.simple_declarator.name);
+                  }
+                }
+                ps.println(");");
                 ps.println("\t\t\t\t\t\t\t\tif (overridden.get()) {");
                 ps.println("\t\t\t\t\t\t\t\t\treturn _result;");
                 ps.println("\t\t\t\t\t\t\t\t}");
               }
               else
               {
-                ps.println("\t\t\t\t\t\t\t\toperationsOverride._invoke(\"" + idl_name + "\", " + (opAttribute == NO_ATTRIBUTE) + ", this::_request, this::_invoke, overridden);");
+                ps.println("\t\t\t\t\t\t\t\toperationsOverride._invoke(\"" + idl_name + "\", " + (opAttribute == NO_ATTRIBUTE) + ", this::_request, this::_invoke, overridden");
+                for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); ) {
+                  ParamDecl p = ( (ParamDecl)e.nextElement() );
+                  if (p.paramAttribute != ParamDecl.MODE_OUT) {
+                    ps.print(", " + p.simple_declarator.name);
+                  }
+                }
+                ps.println(");");
                 ps.println("\t\t\t\t\t\t\t\tif (overridden.get()) {");
                 ps.println("\t\t\t\t\t\t\t\t\treturn;");
                 ps.println("\t\t\t\t\t\t\t\t}");
