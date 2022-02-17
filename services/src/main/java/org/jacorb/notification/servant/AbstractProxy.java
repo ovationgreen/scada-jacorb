@@ -353,7 +353,12 @@ public abstract class AbstractProxy implements FilterAdminOperations, QoSAdminOp
     {
         checkDestroyStatus();
 
-        container_.dispose();
+        try {
+            container_.dispose();
+        }
+        catch (IllegalStateException e) {
+            // Already disposed
+        }
 
         final List list = container_.getComponentInstancesOfType(IContainer.class);
         for (Iterator i = list.iterator(); i.hasNext();)

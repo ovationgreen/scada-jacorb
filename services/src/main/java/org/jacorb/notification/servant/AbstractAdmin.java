@@ -321,7 +321,12 @@ public abstract class AbstractAdmin implements QoSAdminOperations,
     {
         checkDestroyStatus();
 
-        container_.dispose();
+        try {
+            container_.dispose();
+        }
+        catch (IllegalStateException e) {
+            // Already disposed
+        }
 
         List list = container_.getComponentInstancesOfType(IContainer.class);
 

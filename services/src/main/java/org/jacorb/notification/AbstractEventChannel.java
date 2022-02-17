@@ -420,7 +420,12 @@ public abstract class AbstractEventChannel implements IServantLifecyle, JMXManag
     {
         if (destroyed_.compareAndSet(false, true))
         {
-            container_.dispose();
+            try {
+                container_.dispose();
+            }
+            catch (IllegalStateException e) {
+                // Already disposed
+            }
 
             final List list = container_.getComponentInstancesOfType(IContainer.class);
 

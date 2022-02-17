@@ -307,7 +307,12 @@ public abstract class AbstractChannelFactory implements ManageableServant, Dispo
 
         channelManager_.dispose();
 
-        container_.dispose();
+        try {
+            container_.dispose();
+        }
+        catch (IllegalStateException e) {
+            // Already disposed
+        }
 
         disposableManager_.dispose();
     }
