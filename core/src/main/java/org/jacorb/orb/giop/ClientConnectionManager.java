@@ -171,7 +171,7 @@ public class ClientConnectionManager
             
             connection.close();
             synchronized (this) {
-              connections.remove(connection.getRegisteredProfile());
+              connections.remove(connection.getRegisteredProfile(), connection);
             }
         }
         else
@@ -192,7 +192,7 @@ public class ClientConnectionManager
      */
     public synchronized void removeConnection(ClientConnection connection)
     {
-        connections.remove( connection.getRegisteredProfile() );
+        connections.remove( connection.getRegisteredProfile(), connection );
     }
 
     public synchronized void addConnection( GIOPConnection connection,

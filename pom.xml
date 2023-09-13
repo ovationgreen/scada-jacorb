@@ -24,7 +24,7 @@
 
     <groupId>org.jacorb</groupId>
     <artifactId>jacorb-parent</artifactId>
-    <version>3.9.0.25</version>
+    <version>3.9.0.26</version>
     <packaging>pom</packaging>
 
     <name>JacORB</name>
@@ -818,7 +818,7 @@
     <repository>
       <id>public</id>
       <name>Public Repositories</name>
-      <url>http://uaap01:8081/nexus/content/groups/public</url>
+      <url>http://uaap03:8081/nexus/content/groups/public</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -832,7 +832,7 @@
     <pluginRepository>
       <id>public</id>
       <name>Public Repositories</name>
-      <url>http://uaap01:8081/nexus/content/groups/public</url>
+      <url>http://uaap03:8081/nexus/content/groups/public</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -847,7 +847,7 @@
     <repository>
       <id>releases</id>
       <name>Releases</name>
-      <url>dav:http://uaap01:8081/nexus/content/repositories/thirdparty</url>
+      <url>dav:http://uaap03:8081/nexus/content/repositories/thirdparty</url>
     </repository>
   </distributionManagement>
 
