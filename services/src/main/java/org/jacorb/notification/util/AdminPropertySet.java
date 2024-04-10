@@ -63,6 +63,7 @@ public class AdminPropertySet
         _adminProps.add("NotifyChannel");
         _adminProps.add("DatabaseHost");
         _adminProps.add("DatabaseName");
+        _adminProps.add("StartTime");
 
         sAdminPropertyNames_ = Collections.unmodifiableSet(_adminProps);
     }
