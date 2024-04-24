@@ -394,6 +394,14 @@ public class AOM
         }
         catch (InterruptedException ie)
         {
+          try {
+            removalQueue.put (rs);
+          }
+          catch (InterruptedException ie2) {
+          }
+          finally {
+            Thread.currentThread().interrupt();
+          }
         }
     }
 
