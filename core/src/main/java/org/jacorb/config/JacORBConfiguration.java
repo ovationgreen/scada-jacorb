@@ -772,6 +772,10 @@ public class JacORBConfiguration implements Configuration
               }
            }
         }
+        // Performance optimization.
+        if (optimizeLogger && logger != null) {
+          return logger;
+        }
         return org.slf4j.LoggerFactory.getLogger (loggerName);
     }
 
@@ -1221,5 +1225,13 @@ public class JacORBConfiguration implements Configuration
        }
 
        return result.doubleValue ();
+    }
+    
+    /** Return general logger. */
+    private static boolean optimizeLogger;
+    
+    /** Enable logger optimization. */
+    public static void setOptimizeLogger(boolean value) {
+      optimizeLogger = value;
     }
 }
