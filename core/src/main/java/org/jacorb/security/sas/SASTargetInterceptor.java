@@ -164,7 +164,7 @@ public class SASTargetInterceptor
           // First check whether the target is interested in SAS at all
           Policy targetSasPolicy = null;
           try {
-            targetSasPolicy = ri.get_server_policy(SAS_POLICY_TYPE.value);
+            targetSasPolicy = ri.get_server_policy_null(SAS_POLICY_TYPE.value);
           }
           catch(Exception ex) {
           }
@@ -199,10 +199,14 @@ public class SASTargetInterceptor
         try
         {
             ServiceContext ctx =
-                ri.get_request_service_context(SASInitializer.SecurityAttributeService);
-            Any ctx_any =
+                ri.get_request_service_context_null(SASInitializer.SecurityAttributeService);
+            
+            if (ctx != null)
+            {
+              Any ctx_any =
                 codec.decode_value( ctx.context_data, SASContextBodyHelper.type() );
-            contextBody = SASContextBodyHelper.extract(ctx_any);
+              contextBody = SASContextBodyHelper.extract(ctx_any);
+            }
         }
         catch (BAD_PARAM e)
         {
@@ -407,11 +411,19 @@ public class SASTargetInterceptor
         try
         {
             ServiceContext ctx =
-                ri.get_request_service_context(SASInitializer.SecurityAttributeService);
-            Any ctx_any =
+                ri.get_request_service_context_null(SASInitializer.SecurityAttributeService);
+            
+            if (ctx != null) {
+              Any ctx_any =
                 codec.decode_value( ctx.context_data, SASContextBodyHelper.type() );
-            contextBody =
+              contextBody =
                 SASContextBodyHelper.extract(ctx_any);
+            }
+            else {
+              if (logger.isDebugEnabled())
+                logger.debug("Could not parse service context for operation " +
+                         ri.operation());
+            }
         }
         catch (BAD_PARAM e)
         {

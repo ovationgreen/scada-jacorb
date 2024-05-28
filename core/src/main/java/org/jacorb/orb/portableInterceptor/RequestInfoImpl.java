@@ -197,6 +197,18 @@ public abstract class RequestInfoImpl
 
         return result;
     }
+    
+    public ServiceContext get_reply_service_context_null(int id)
+    {
+        final ServiceContext result;
+
+        synchronized(reply_ctx)
+        {
+            result = reply_ctx.get(id);
+        }
+
+        return result;
+    }
 
     public ServiceContext get_request_service_context(int id)
     {
@@ -210,6 +222,18 @@ public abstract class RequestInfoImpl
         if (result == null)
         {
             throw new BAD_PARAM("No ServiceContext with id " + id, 26, CompletionStatus.COMPLETED_MAYBE);
+        }
+
+        return result;
+    }
+    
+    public ServiceContext get_request_service_context_null(int id)
+    {
+        final ServiceContext result;
+
+        synchronized(request_ctx)
+        {
+            result = request_ctx.get(Integer.valueOf(id));
         }
 
         return result;

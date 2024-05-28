@@ -494,6 +494,28 @@ public class ServerRequestInfoImpl
             throw e;
         }
     }
+    
+    /**
+     * WARNING: This method relies on the DomainService to be available.
+     * Make shure that the DS is running, if you want to call this method.
+     */
+    public Policy get_server_policy_null(int type) {
+        if (! orb.hasPolicyFactoryForType(type))
+        {
+            return null;
+        }
+
+        try
+        {
+            org.jacorb.orb.ServantDelegate delegate = (org.jacorb.orb.ServantDelegate) servant._get_delegate();
+            return delegate._get_policy(servant._this_object(), type);
+        }
+        catch(INV_POLICY e)
+        {
+            e.minor = 2;
+            throw e;
+        }
+    }
 
     @Override
     public void set_slot(int id, Any data) throws InvalidSlot

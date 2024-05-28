@@ -755,6 +755,10 @@ public class JacORBConfiguration implements Configuration
     @Override
     public org.slf4j.Logger getLogger (String name)
     {
+        // Performance optimization.
+        if (optimizeLogger && logger != null) {
+          return logger;
+        }
         String loggerName = name;
         if (getAttributeAsBoolean ("jacorb.log.split_on_implname", false))
         {
@@ -771,10 +775,6 @@ public class JacORBConfiguration implements Configuration
                  loggerName = LoggingInitializer.ATTR_LOG_NAME + '.' + implName + "." + name.substring (11);
               }
            }
-        }
-        // Performance optimization.
-        if (optimizeLogger && logger != null) {
-          return logger;
         }
         return org.slf4j.LoggerFactory.getLogger (loggerName);
     }

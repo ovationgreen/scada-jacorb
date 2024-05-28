@@ -176,10 +176,17 @@ public class SASClientInterceptor
         CompoundSecMechList csmList = null;
         try
         {
-            TaggedComponent tc = ri.get_effective_component(TAG_CSI_SEC_MECH_LIST.value);
-            CDRInputStream is = new CDRInputStream(tc.component_data);
-            is.openEncapsulatedArray();
-            csmList = CompoundSecMechListHelper.read( is );
+            TaggedComponent tc = ri.get_effective_component_null(TAG_CSI_SEC_MECH_LIST.value);
+            if (tc != null) {
+              CDRInputStream is = new CDRInputStream(tc.component_data);
+              is.openEncapsulatedArray();
+              csmList = CompoundSecMechListHelper.read( is );
+            }
+            else {
+              if (logger.isDebugEnabled())
+                logger.debug("Did not find tagged component TAG_CSI_SEC_MECH_LIST: "+
+                             ri.operation());
+            }
         }
         catch (BAD_PARAM e)
         {
@@ -271,7 +278,10 @@ public class SASClientInterceptor
         ServiceContext ctx = null;
         try
         {
-            ctx = ri.get_reply_service_context(SecurityAttributeService);
+            ctx = ri.get_reply_service_context_null(SecurityAttributeService);
+            
+            if (ctx == null && logger.isDebugEnabled())
+                logger.debug("No SAS security context found: "+ri.operation());
         }
         catch (BAD_PARAM e)
         {
@@ -336,7 +346,10 @@ public class SASClientInterceptor
         ServiceContext ctx = null;
         try
         {
-            ctx = ri.get_reply_service_context(SecurityAttributeService);
+            ctx = ri.get_reply_service_context_null(SecurityAttributeService);
+            
+            if (ctx == null && logger.isDebugEnabled())
+              logger.debug("No SAS security context found (exception): "+ri.operation());
         }
         catch (BAD_PARAM e)
         {

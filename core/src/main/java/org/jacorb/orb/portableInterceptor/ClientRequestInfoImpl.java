@@ -395,6 +395,18 @@ public class ClientRequestInfoImpl
 
         return super.get_reply_service_context(id);
     }
+    
+    public ServiceContext get_reply_service_context_null(int id)
+    {
+        if ((caller_op == ClientInterceptorIterator.SEND_REQUEST) ||
+            (caller_op == ClientInterceptorIterator.SEND_POLL))
+        {
+            throw new BAD_INV_ORDER("The attribute \"reply_status\" is currently invalid!",
+                                    10, CompletionStatus.COMPLETED_MAYBE);
+        }
+
+        return super.get_reply_service_context_null(id);
+    }
 
     // implementation of ClientRequestInfoOperations interface
     public org.omg.CORBA.Object target()
@@ -453,6 +465,26 @@ public class ClientRequestInfoImpl
 
         throw new BAD_PARAM("No TaggedComponent with id " + id + " found",
                             25, CompletionStatus.COMPLETED_MAYBE);
+    }
+    
+    public TaggedComponent get_effective_component_null(int id)
+    {
+        if (caller_op == ClientInterceptorIterator.SEND_POLL)
+        {
+            throw new BAD_INV_ORDER("The operation \"get_effective_component\" is " +
+                                    "currently invalid!", 10,
+                                    CompletionStatus.COMPLETED_MAYBE);
+        }
+
+        for(int _i = 0; _i < effective_components.length; _i++)
+        {
+            if (effective_components[_i].tag == id)
+            {
+                return effective_components[_i];
+            }
+        }
+
+        return null;
     }
 
     public TaggedComponent[] get_effective_components(int id)
