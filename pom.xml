@@ -818,7 +818,8 @@
     <repository>
       <id>public</id>
       <name>Public Repositories</name>
-      <url>http://uaap03:8081/nexus/content/groups/public</url>
+      <!--url>http://uaap03:8081/nexus/content/groups/public</url-->
+      <url>http://uaap03:8082/repository/public</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -832,7 +833,8 @@
     <pluginRepository>
       <id>public</id>
       <name>Public Repositories</name>
-      <url>http://uaap03:8081/nexus/content/groups/public</url>
+      <!--url>http://uaap03:8081/nexus/content/groups/public</url-->
+      <url>http://uaap03:8082/repository/public</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -847,7 +849,8 @@
     <repository>
       <id>releases</id>
       <name>Releases</name>
-      <url>dav:http://uaap03:8081/nexus/content/repositories/thirdparty</url>
+      <!--url>dav:http://uaap03:8081/nexus/content/repositories/thirdparty</url-->
+      <url>dav:http://uaap03:8082/repository/thirdparty/</url>
     </repository>
   </distributionManagement>
 
