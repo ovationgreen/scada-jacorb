@@ -607,7 +607,7 @@ public class StructType
         }
         ps.println("\t}");
         
-        if (!this.exc)
+        /*if (!this.exc)*/
         {
           ps.println("\tpublic static " + type + " clone (final " + type + " that)");
           ps.println("\t{");
