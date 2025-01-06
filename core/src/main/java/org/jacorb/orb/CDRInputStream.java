@@ -56,6 +56,7 @@ import org.slf4j.Logger;
 import org.jacorb.orb.HelperOverride;
 import org.jacorb.orb.HelperOverrideHook;
 import org.jacorb.orb.HelperOverrideCreator;
+import org.jacorb.orb.TypeCodeOverride;
 
 /**
  * Read CDR encoded data
@@ -190,6 +191,7 @@ public class CDRInputStream
     
     public static HelperOverrideHook helperOverrideHook;
     public HelperOverrideCreator helperOverrideCreator;
+    public static TypeCodeOverride typeCodeOverride;
 
     private CDRInputStream(org.omg.CORBA.ORB orb)
     {
@@ -1346,7 +1348,11 @@ public class CDRInputStream
         {
             helperOverrideCreator = null;
             ++typeCodeNestingLevel;
-            return typeCodeReader.readTypeCode(logger, this, recursiveTCMap, repeatedTCMap);
+            org.omg.CORBA.TypeCode tc = typeCodeReader.readTypeCode(logger, this, recursiveTCMap, repeatedTCMap);
+            if (typeCodeOverride != null) {
+              tc = typeCodeOverride.replace(tc);
+            }
+            return tc;
         }
         finally
         {
