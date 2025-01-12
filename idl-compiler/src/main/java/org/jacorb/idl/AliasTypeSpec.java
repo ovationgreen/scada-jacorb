@@ -460,12 +460,12 @@ public class AliasTypeSpec
             }
             else
             {
-                ps.println("public abstract class " + className + "Helper");
+                ps.println("public abstract class " + className + "Helper implements org.jacorb.orb.AliasHelper");
             }
         }
         else 
         {
-            ps.println("public abstract class " + className + "Helper");
+            ps.println("public abstract class " + className + "Helper implements org.jacorb.orb.AliasHelper");
         }
         ps.println("{");
 

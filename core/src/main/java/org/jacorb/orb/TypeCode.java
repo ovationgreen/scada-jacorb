@@ -43,6 +43,8 @@ import org.omg.CORBA.ValueMember;
 public class TypeCode
     extends org.omg.CORBA.TypeCode
 {
+    private static final long serialVersionUID = -3881151403373487607L;
+
     private final int kind;
     private transient TCKind tcKind;
 
@@ -69,13 +71,13 @@ public class TypeCode
     private TypeCode    actualTypecode = null;
     private boolean     secondIteration = false;
 
-    private final static org.omg.CORBA.TypeCode[]  primitive_tcs = new TypeCode[34];
+    public final static org.omg.CORBA.TypeCode[]  primitive_tcs = new TypeCode[34];
 
     /**
      * Maps the java.lang.Class objects for primitive types to
      * their corresponding TypeCode objects.
      */
-    private final static Map primitive_tcs_map = new HashMap();
+    public final static Map<Class, org.omg.CORBA.TypeCode> primitive_tcs_map = new HashMap();
 
     static
     {
@@ -610,6 +612,11 @@ public class TypeCode
             }
         }
     }
+    
+    public java.lang.String id_null()
+    {
+        return id;
+    }
 
     public java.lang.String name()
         throws org.omg.CORBA.TypeCodePackage.BadKind
@@ -637,6 +644,11 @@ public class TypeCode
             default:
                 throw new org.omg.CORBA.TypeCodePackage.BadKind();
         }
+    }
+    
+    public java.lang.String name_null()
+    {
+        return name;
     }
 
     public int member_count()
@@ -1093,7 +1105,7 @@ public class TypeCode
      * the place holder return TRUE.
      */
 
-    private boolean is_recursive()
+    public boolean is_recursive()
     {
         return recursive;
     }
