@@ -39,12 +39,22 @@ public class SimpleTypeCodeReader extends AbstractTypeCodeReader
         {
             case TCKind._tk_string:         // 18
             {
-                result = orb.create_string_tc(in.read_long());
+                int bound = in.read_long();
+                if (bound == 0) {
+                  result = orb.get_primitive_tc(TCKind.tk_string);
+                } else {
+                  result = orb.create_string_tc(bound);
+                }
                 break;
             }
             case TCKind._tk_wstring:        // 27
             {
-                result = orb.create_wstring_tc(in.read_long());
+                int bound = in.read_long();
+                if (bound == 0) {
+                  result = orb.get_primitive_tc(TCKind.tk_wstring);
+                } else {
+                  result = orb.create_wstring_tc(bound);
+                }
                 break;
             }
             case TCKind._tk_fixed:          // 28
