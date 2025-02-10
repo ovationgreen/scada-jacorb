@@ -750,7 +750,7 @@ public final class Any
     public void insert_string (String s)
     {
         value = s;
-        typeCode = orb.get_primitive_tc(TCKind.tk_string); // typeCode = orb.create_string_tc (0);
+        typeCode = orb.create_string_tc (0);
     }
 
     public String extract_string()
@@ -781,7 +781,7 @@ public final class Any
     public void insert_wstring (String s)
     {
         value = s;
-        typeCode = orb.get_primitive_tc(TCKind.tk_wstring); // typeCode = orb.create_wstring_tc (0);
+        typeCode = orb.create_wstring_tc (0);
     }
 
     public String extract_wstring()
