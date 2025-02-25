@@ -276,7 +276,22 @@ public class OpDecl
               ps.println("\t\t\t\t\t\t\t\tjava.util.concurrent.atomic.AtomicBoolean overridden = new java.util.concurrent.atomic.AtomicBoolean();");
               if( opAttribute == 0 && !( opTypeSpec.typeSpec() instanceof VoidTypeSpec ) )
               {
-                ps.print("\t\t\t\t\t\t\t\t" + opTypeSpec.toString() + " _result = operationsOverride._invoke(\"" + idl_name + "\", " + (opAttribute == NO_ATTRIBUTE) + ", this::_request, this::_invoke, overridden");
+                String opTypeSpecStr = opTypeSpec.toString();
+                if (opTypeSpecStr.equals("boolean"))
+                  opTypeSpecStr = "Boolean";
+                else if (opTypeSpecStr.equals("int"))
+                  opTypeSpecStr = "Integer";
+                else if (opTypeSpecStr.equals("long"))
+                  opTypeSpecStr = "Long";
+                else if (opTypeSpecStr.equals("short"))
+                  opTypeSpecStr = "Short";
+                else if (opTypeSpecStr.equals("byte"))
+                  opTypeSpecStr = "Byte";
+                else if (opTypeSpecStr.equals("float"))
+                  opTypeSpecStr = "Float";
+                else if (opTypeSpecStr.equals("double"))
+                  opTypeSpecStr = "Double";
+                ps.print("\t\t\t\t\t\t\t\t" + opTypeSpecStr + " _result = operationsOverride._invoke(\"" + idl_name + "\", " + (opAttribute == NO_ATTRIBUTE) + ", this::_request, this::_invoke, overridden");
                 for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); ) {
                   ParamDecl p = ( (ParamDecl)e.nextElement() );
                   if (p.paramAttribute != ParamDecl.MODE_OUT) {
