@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.jacorb</groupId>
         <artifactId>jacorb-parent</artifactId>
-        <version>3.9.0.36</version>
+        <version>3.10.0.1</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -16,7 +16,7 @@
 
     <name>JacORB IDL Compiler</name>
     <description>JacORB IDL Compiler</description>
-    <url>http://www.jacorb.org</url>
+    <url>https://www.jacorb.org</url>
 
     <dependencies>
         <dependency>

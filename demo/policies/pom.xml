@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.jacorb.jacorb-demo</groupId>
         <artifactId>demo-parent</artifactId>
-        <version>3.9</version>
+        <version>3.10-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -66,7 +66,7 @@
                                         <java fork="true"
                                               classpathref="maven.runtime.classpath"
                                               className="org.jacorb.demo.policies.Server">
-                                            <jvmarg value="-Xbootclasspath/p:${demo_classpath}" />
+                                            <jvmarg value="${demobootclasspath}" />
                                             <jvmarg value="-Dorg.omg.CORBA.ORBClass=org.jacorb.orb.ORB" />
                                             <jvmarg value="-Dorg.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton" />
                                             <arg value="${ior.file}"/>
@@ -80,7 +80,7 @@
                                         <java fork="true"
                                               classpathref="maven.runtime.classpath"
                                               className="org.jacorb.demo.policies.Client">
-                                            <jvmarg value="-Xbootclasspath/p:${demo_classpath}" />
+                                            <jvmarg value="${demobootclasspath}" />
                                             <jvmarg value="-Dorg.omg.CORBA.ORBClass=org.jacorb.orb.ORB" />
                                             <jvmarg value="-Dorg.omg.CORBA.ORBSingletonClass=org.jacorb.orb.ORBSingleton" />
                                             <arg value="${ior.file}"/>
