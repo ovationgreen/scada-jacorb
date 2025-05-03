@@ -25,10 +25,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jacorb.config.*;
+import org.jacorb.config.Configurable;
+import org.jacorb.config.Configuration;
+import org.jacorb.config.ConfigurationException;
 import org.jacorb.notification.conf.Attributes;
 import org.jacorb.notification.conf.Default;
 import org.jacorb.notification.util.QoSPropertySet;
+import org.omg.CORBA.Any;
 import org.omg.CosNotification.AnyOrder;
 import org.omg.CosNotification.DeadlineOrder;
 import org.omg.CosNotification.DiscardPolicy;
@@ -138,7 +141,16 @@ public class EventQueueFactory implements Configurable
 
         try
         {
-            maxEventsPerConsumer = qosProperties.get(MaxEventsPerConsumer.value).extract_long();
+            Any any = qosProperties.get(MaxEventsPerConsumer.value);
+            
+            if (any != null)
+            {
+              maxEventsPerConsumer = any.extract_long();
+            }
+            else
+            {
+              maxEventsPerConsumer = Default.DEFAULT_MAX_EVENTS_PER_CONSUMER;
+            }
         } catch (Exception e)
         {
             maxEventsPerConsumer = Default.DEFAULT_MAX_EVENTS_PER_CONSUMER;

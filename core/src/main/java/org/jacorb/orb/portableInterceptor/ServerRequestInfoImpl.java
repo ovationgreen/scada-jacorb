@@ -504,6 +504,11 @@ public class ServerRequestInfoImpl
         {
             return null;
         }
+        
+        if (servant == null)
+        {
+            return null;
+        }
 
         try
         {

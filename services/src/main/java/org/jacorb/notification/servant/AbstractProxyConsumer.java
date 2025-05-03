@@ -22,8 +22,9 @@ package org.jacorb.notification.servant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.jacorb.config.*;
+import org.jacorb.config.Configuration;
 import org.jacorb.notification.EventTypeWrapper;
 import org.jacorb.notification.MessageFactory;
 import org.jacorb.notification.OfferManager;
@@ -36,6 +37,7 @@ import org.jacorb.notification.interfaces.MessageConsumer;
 import org.jacorb.notification.interfaces.MessageSupplier;
 import org.jacorb.notification.util.PropertySet;
 import org.jacorb.notification.util.PropertySetAdapter;
+import org.omg.CORBA.Any;
 import org.omg.CORBA.NO_IMPLEMENT;
 import org.omg.CORBA.ORB;
 import org.omg.CosNotification.EventType;
@@ -52,8 +54,6 @@ import org.omg.CosNotifyComm.NotifySubscribe;
 import org.omg.CosNotifyComm.NotifySubscribeHelper;
 import org.omg.CosNotifyComm.NotifySubscribeOperations;
 import org.omg.PortableServer.POA;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @jmx.mbean extends = "AbstractProxyMBean"
@@ -135,7 +135,16 @@ public abstract class AbstractProxyConsumer extends AbstractProxy implements IPr
     {
         try
         {
-            isStartTimeSupported_.set(qosSettings_.get(StartTimeSupported.value).extract_boolean());
+            Any any = qosSettings_.get(StartTimeSupported.value);
+            
+            if (any != null)
+            {
+              isStartTimeSupported_.set(any.extract_boolean());
+            }
+            else 
+            {
+              isStartTimeSupported_.set(Default.DEFAULT_START_TIME_SUPPORTED.equals("on"));
+            }
         } catch (Exception e)
         {
             isStartTimeSupported_.set(Default.DEFAULT_START_TIME_SUPPORTED.equals("on"));
@@ -152,7 +161,16 @@ public abstract class AbstractProxyConsumer extends AbstractProxy implements IPr
         logger_.debug("QoSSettings: " + qosSettings_);
         try
         {
-            isStopTimeSupported_.set(qosSettings_.get(StopTimeSupported.value).extract_boolean());
+            Any any = qosSettings_.get(StopTimeSupported.value);
+            
+            if (any != null)
+            {
+              isStopTimeSupported_.set(any.extract_boolean());
+            }
+            else 
+            {
+              isStopTimeSupported_.set(Default.DEFAULT_STOP_TIME_SUPPORTED.equals("on"));
+            }
         } catch (Exception e)
         {
             isStopTimeSupported_.set(Default.DEFAULT_STOP_TIME_SUPPORTED.equals("on"));

@@ -28,7 +28,7 @@
 
     <groupId>org.jacorb</groupId>
     <artifactId>jacorb-parent</artifactId>
-    <version>3.10.0.1</version>
+    <version>3.10.0.2</version>
     <packaging>pom</packaging>
 
     <name>JacORB</name>
