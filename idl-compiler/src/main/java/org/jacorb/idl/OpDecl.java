@@ -294,9 +294,9 @@ public class OpDecl
                 ps.print("\t\t\t\t\t\t\t\t" + opTypeSpecStr + " _result = operationsOverride._invoke(\"" + idl_name + "\", " + (opAttribute == NO_ATTRIBUTE) + ", this::_request, this::_invoke, overridden");
                 for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); ) {
                   ParamDecl p = ( (ParamDecl)e.nextElement() );
-                  if (p.paramAttribute != ParamDecl.MODE_OUT) {
+                  // if (p.paramAttribute != ParamDecl.MODE_OUT) {
                     ps.print(", " + p.simple_declarator.name);
-                  }
+                  // }
                 }
                 ps.println(");");
                 ps.println("\t\t\t\t\t\t\t\tif (overridden.get()) {");
@@ -308,9 +308,9 @@ public class OpDecl
                 ps.println("\t\t\t\t\t\t\t\toperationsOverride._invoke(\"" + idl_name + "\", " + (opAttribute == NO_ATTRIBUTE) + ", this::_request, this::_invoke, overridden");
                 for( Enumeration e = paramDecls.elements(); e.hasMoreElements(); ) {
                   ParamDecl p = ( (ParamDecl)e.nextElement() );
-                  if (p.paramAttribute != ParamDecl.MODE_OUT) {
+                  // if (p.paramAttribute != ParamDecl.MODE_OUT) {
                     ps.print(", " + p.simple_declarator.name);
-                  }
+                  // }
                 }
                 ps.println(");");
                 ps.println("\t\t\t\t\t\t\t\tif (overridden.get()) {");
