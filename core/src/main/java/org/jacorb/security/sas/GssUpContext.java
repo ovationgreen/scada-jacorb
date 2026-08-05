@@ -324,7 +324,7 @@ public class GssUpContext
     }
     
     @SuppressWarnings("unused")
-    public void setVersionHandshake(Thread thread, String helperVersionHandhsake)
+    public void setVersionHandshake(String helperVersionHandhsake)
     {
       // ...
     }

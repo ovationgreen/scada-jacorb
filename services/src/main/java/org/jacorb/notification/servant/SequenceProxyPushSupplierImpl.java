@@ -246,7 +246,7 @@ public class SequenceProxyPushSupplierImpl extends AbstractProxyPushSupplier imp
         String key = helperVersionHandhshake;
         if (key != null)
         {
-            GssUpContext.INSTANCE.setVersionHandshake(Thread.currentThread(), key);
+            GssUpContext.INSTANCE.setVersionHandshake(key);
         }
         try
         {
@@ -259,7 +259,7 @@ public class SequenceProxyPushSupplierImpl extends AbstractProxyPushSupplier imp
         {
             if (key != null)
             {
-                GssUpContext.INSTANCE.setVersionHandshake(Thread.currentThread(), null);
+                GssUpContext.INSTANCE.setVersionHandshake((String)null);
             }
         }
     }
