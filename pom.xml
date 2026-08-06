@@ -743,6 +743,11 @@
             <artifactId>wagon-webdav</artifactId>
             <version>1.0-beta-2</version>
           </extension>
+		  <extension>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-transport-wagon</artifactId>
+			<version>1.9.28.1</version>
+          </extension>
         </extensions>
         
     </build>
